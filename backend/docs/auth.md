@@ -34,14 +34,6 @@ Base URL: `/api/auth/`
 }
 ```
 
-**Error (400 Bad Request):**
-```json
-{
-    "email": ["Email already exists."],
-    "password": ["This password is too short."]
-}
-```
-
 ## 2. User Login
 
 **Endpoint:** `POST /api/auth/login/`
@@ -74,13 +66,6 @@ Base URL: `/api/auth/`
 }
 ```
 
-**Error (400 Bad Request):**
-```json
-{
-    "non_field_errors": ["Invalid credentials."]
-}
-```
-
 ## 3. User Logout
 
 **Endpoint:** `POST /api/auth/logout/`
@@ -102,13 +87,6 @@ Base URL: `/api/auth/`
 ```json
 {
     "detail": "Successfully logged out."
-}
-```
-
-**Error (400 Bad Request):**
-```json
-{
-    "non_field_errors": ["Invalid or expired token."]
 }
 ```
 
@@ -136,6 +114,30 @@ No request body required.
 }
 ```
 
+## 5. Refresh Token
+
+**Endpoint:** `POST /api/auth/refresh/`
+
+**Authentication Required:** No
+
+**Description:** Get a new access token using a valid refresh token.
+
+### Request Format
+```json
+{
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+### Response Format
+
+**Success (200 OK):**
+```json
+{
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
 ## Authentication Headers
 
 For endpoints requiring authentication, include the JWT access token in the Authorization header:
@@ -154,9 +156,3 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
 - **created_at**: Timestamp when user account was created
 - **access**: JWT access token (expires in 5 minutes by default)
 - **refresh**: JWT refresh token (used to obtain new access tokens)
-
-## Error Codes
-
-- **400 Bad Request**: Invalid input data or validation errors
-- **401 Unauthorized**: Missing or invalid authentication token
-- **403 Forbidden**: Valid token but insufficient permissions
