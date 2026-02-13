@@ -1,12 +1,16 @@
 from django.db.models import Q
-from rest_framework import generics, permissions
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, permissions, status
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Category, Post, Tag
+from .models import Category, Comment, Like, Post, Tag
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     CategorySerializer,
+    CommentSerializer,
     PostDetailSerializer,
     PostSerializer,
     TagSerializer,
@@ -62,3 +66,67 @@ class TagListCreateAPIView(ListCreateAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticated]
+
+
+class PostCommentsAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+        comments = post.comments.all().order_by("-created_at")
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        comment = get_object_or_404(Comment, id=id)
+
+        if comment.user != request.user:
+            return Response(
+                {"detail": "Not allowed"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LikePostAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+
+        Like.objects.get_or_create(
+            post=post,
+            user=request.user,
+        )
+
+        return Response({"message": "Post liked"})
+
+
+class UnlikePostAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+
+        Like.objects.filter(
+            post=post,
+            user=request.user,
+        ).delete()
+
+        return Response({"message": "Post unliked"})
