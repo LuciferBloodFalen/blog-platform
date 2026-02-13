@@ -3,9 +3,14 @@ from rest_framework import generics, permissions
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Category, Post
+from .models import Category, Post, Tag
 from .permissions import IsAuthorOrReadOnly
-from .serializers import CategorySerializer, PostDetailSerializer, PostSerializer
+from .serializers import (
+    CategorySerializer,
+    PostDetailSerializer,
+    PostSerializer,
+    TagSerializer,
+)
 
 
 class PostListCreateAPIView(generics.ListCreateAPIView):
@@ -50,4 +55,10 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
 class CategoryListCreateAPIView(ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+
+class TagListCreateAPIView(ListCreateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
     permission_classes = [IsAuthenticated]
