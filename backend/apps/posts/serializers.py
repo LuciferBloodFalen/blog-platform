@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Post
+from .models import Category, Post
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -40,3 +40,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ("created_at", "updated_at")
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "slug"]

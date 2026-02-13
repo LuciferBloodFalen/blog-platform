@@ -1,9 +1,11 @@
 from django.db.models import Q
 from rest_framework import generics, permissions
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Post
+from .models import Category, Post
 from .permissions import IsAuthorOrReadOnly
-from .serializers import PostDetailSerializer, PostSerializer
+from .serializers import CategorySerializer, PostDetailSerializer, PostSerializer
 
 
 class PostListCreateAPIView(generics.ListCreateAPIView):
@@ -43,3 +45,9 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
             )
 
         return Post.objects.filter(is_published=True)
+
+
+class CategoryListCreateAPIView(ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]

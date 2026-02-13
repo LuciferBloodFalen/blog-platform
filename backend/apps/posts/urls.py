@@ -1,9 +1,6 @@
 from django.urls import path
 
-from .views import (
-    PostListCreateAPIView,
-    PostRetrieveUpdateDeleteAPIView,
-)
+from .views import PostListCreateAPIView, PostRetrieveUpdateDeleteAPIView
 
 urlpatterns = [
     path("", PostListCreateAPIView.as_view(), name="post-list-create"),
