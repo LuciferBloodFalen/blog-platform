@@ -10,28 +10,45 @@ Base URL: `/api/posts/`
 
 **Authentication Required:** No
 
-**Description:** Retrieve a list of all published posts. Posts are returned in descending order by creation date.
+**Description:** Retrieve a paginated list of all published posts with filtering, searching, and ordering capabilities. Posts are returned in descending order by creation date by default.
 
-### Request Format
-No request body required.
+### Query Parameters
+- `category__slug` (string, optional): Filter by category slug (exact match)
+- `search` (string, optional): Search in title and content fields
+- `ordering` (string, optional): Order by `created_at` (use `-created_at` for descending, default)
+- `page` (integer, optional): Page number for pagination
+
+### Request Examples
+```
+GET /api/posts/
+GET /api/posts/?category__slug=technology
+GET /api/posts/?search=django&ordering=-created_at
+GET /api/posts/?page=2
+```
 
 ### Response Format
 
 **Success (200 OK):**
 ```json
-[
-    {
-        "title": "My First Blog Post",
-        "slug": "my-first-blog-post",
-        "content": "This is the content of my first blog post...",
-        "author": "john_doe",
-        "category": 1,
-        "tags": [1, 2],
-        "is_published": true,
-        "created_at": "2026-02-12T10:30:00Z",
-        "updated_at": "2026-02-12T10:30:00Z"
-    }
-]
+{
+    "count": 25,
+    "next": "http://localhost:8000/api/posts/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "title": "My First Blog Post",
+            "slug": "my-first-blog-post",
+            "content": "This is the content of my first blog post...",
+            "author": "john_doe",
+            "category": 1,
+            "tags": [1, 2],
+            "is_published": true,
+            "created_at": "2026-02-12T10:30:00Z",
+            "updated_at": "2026-02-12T10:30:00Z",
+            "likes_count": 5
+        }
+    ]
+}
 ```
 
 ## 2. Create Post
@@ -67,7 +84,8 @@ No request body required.
     "tags": [1, 2],
     "is_published": false,
     "created_at": "2026-02-13T14:25:00Z",
-    "updated_at": "2026-02-13T14:25:00Z"
+    "updated_at": "2026-02-13T14:25:00Z",
+    "likes_count": 0
 }
 ```
 
@@ -195,7 +213,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
 ## Field Descriptions
 
 - **title**: The post title (max 255 characters)
-- **slug**: URL-friendly version of the title (unique, auto-generated or manual)
+- **slug**: URL-friendly version of the title (unique, read-only after creation)
 - **content**: The main content/body of the post (supports rich text)
 - **author**: Username of the post author (read-only, automatically set)
 - **category**: ID of the associated category (optional, can be null)
@@ -203,6 +221,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
 - **is_published**: Boolean indicating if the post is publicly visible
 - **created_at**: Timestamp when the post was created (read-only)
 - **updated_at**: Timestamp when the post was last modified (read-only)
+- **likes_count**: Number of likes this post has received (read-only, only in list view)
 
 ## Access Control
 
@@ -211,13 +230,11 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
 - **Authenticated Users**: Can create new posts
 - **Anonymous Users**: Can only view published posts
 
-## Query Parameters
+## Filtering and Search Features
 
-The list posts endpoint supports optional query parameters:
+The list posts endpoint supports the following features:
 
-- **Search**: Filter posts by title or content (implementation dependent)
-- **Category**: Filter posts by category ID
-- **Tags**: Filter posts by tag IDs
-- **Author**: Filter posts by author username
-
-*Note: Specific query parameter implementation may vary based on backend filtering configuration.*
+- **Search**: Use the `search` parameter to search within post title and content
+- **Category Filtering**: Use `category__slug` to filter posts by category slug (exact match)
+- **Ordering**: Use `ordering` parameter with `created_at` or `-created_at` (default is `-created_at`)
+- **Pagination**: Results are paginated with `count`, `next`, and `previous` fields in the response
