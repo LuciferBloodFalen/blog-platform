@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "apps.posts",
     "django_filters",
     "corsheaders",
+    "drf_spectacular",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -136,6 +138,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -150,4 +153,11 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
 CORS_ALLOW_ALL_ORIGINS = True  # remove this before production.
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Blog API",
+    "DESCRIPTION": "API documentation for the blog project",
+    "VERSION": "1.0.0",
+}

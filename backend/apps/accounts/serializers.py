@@ -7,8 +7,20 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    email = serializers.EmailField(required=True)
+    """Serializer for user registration."""
+
+    username = serializers.CharField(
+        max_length=150,
+        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+    )
+    email = serializers.EmailField(
+        required=True, help_text="Required. A valid email address. Must be unique."
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        help_text="Required. Must meet password strength requirements.",
+    )
 
     class Meta:
         model = User
@@ -21,6 +33,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "is_author", "created_at"]
+        extra_kwargs = {
+            "id": {"help_text": "Unique identifier for the user."},
+            "is_author": {
+                "help_text": "Whether the user has author privileges (read-only)."
+            },
+            "created_at": {
+                "help_text": "Timestamp when the account was created (read-only)."
+            },
+        }
 
     def validate_email(self, value):
         value = value.lower()
@@ -43,8 +64,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    """Serializer for user login authentication."""
+
+    email = serializers.EmailField(
+        help_text="The email address associated with the account."
+    )
+    password = serializers.CharField(
+        write_only=True,
+        help_text="The account password. Will not be returned in responses.",
+    )
 
     def validate(self, attrs):
         email = attrs.get("email")
@@ -78,7 +106,9 @@ class LoginSerializer(serializers.Serializer):
 
 
 class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
+    """Serializer for user logout."""
+
+    refresh = serializers.CharField(help_text="The refresh token to be blacklisted.")
 
     def validate(self, attrs):
         self.token = attrs["refresh"]
@@ -93,6 +123,8 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer for user profile information."""
+
     class Meta:
         model = User
         fields = [
@@ -102,3 +134,10 @@ class UserSerializer(serializers.ModelSerializer):
             "is_author",
             "created_at",
         ]
+        extra_kwargs = {
+            "id": {"help_text": "Unique identifier for the user."},
+            "username": {"help_text": "The user's display name."},
+            "email": {"help_text": "The user's email address."},
+            "is_author": {"help_text": "Whether the user has author privileges."},
+            "created_at": {"help_text": "Timestamp when the account was created."},
+        }

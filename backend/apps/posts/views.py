@@ -20,6 +20,22 @@ from .serializers import (
 
 
 class PostListCreateAPIView(generics.ListCreateAPIView):
+    """API view for listing and creating blog posts.
+
+    GET: Returns a paginated list of published posts. Supports filtering
+         by category, searching in title/content, and ordering by date.
+    POST: Creates a new post. Requires authentication.
+
+    Filtering:
+        - category__slug: Filter posts by category slug
+
+    Search Fields:
+        - title, content
+
+    Ordering:
+        - created_at (default: descending)
+    """
+
     serializer_class = PostSerializer
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -33,6 +49,7 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
+        """Return published posts with optimized related data fetching."""
         return (
             Post.objects.filter(is_published=True)
             .select_related("author", "category")
@@ -40,20 +57,36 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
         )
 
     def get_permissions(self):
+        """Allow anyone to list posts, but require auth to create."""
         if self.request.method == "POST":
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
+        """Set the authenticated user as the post author on creation."""
         serializer.save(author=self.request.user)
 
 
 class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """API view for retrieving, updating, and deleting a single post.
+
+    GET: Retrieve a post by slug. Authors can view their own drafts.
+    PUT/PATCH: Update a post. Only the author can modify their posts.
+    DELETE: Remove a post. Only the author can delete their posts.
+
+    Note: The slug field is immutable and cannot be updated.
+    """
+
     serializer_class = PostDetailSerializer
     lookup_field = "slug"
     permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
+        """Return posts based on user authentication status.
+
+        Authenticated users can see their own drafts plus all published posts.
+        Anonymous users can only see published posts.
+        """
         user = self.request.user
 
         if user.is_authenticated:
@@ -68,27 +101,62 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):
+    """API view for listing and creating categories.
+
+    GET: Returns all categories.
+    POST: Creates a new category. Requires authentication.
+    """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 
 
 class TagListCreateAPIView(ListCreateAPIView):
+    """API view for listing and creating tags.
+
+    GET: Returns all tags.
+    POST: Creates a new tag. Requires authentication.
+    """
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticated]
 
 
 class PostCommentsAPIView(APIView):
+    """API view for listing and creating comments on a post.
+
+    GET: Returns all comments for a post, ordered by most recent first.
+    POST: Creates a new comment on a post. Requires authentication.
+    """
+
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, slug):
+        """Retrieve all comments for a specific post.
+
+        Args:
+            slug: The unique slug identifier of the post.
+
+        Returns:
+            List of comments ordered by creation date (newest first).
+        """
         post = get_object_or_404(Post, slug=slug)
         comments = post.comments.all().order_by("-created_at")
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     def post(self, request, slug):
+        """Create a new comment on a post.
+
+        Args:
+            slug: The unique slug identifier of the post.
+
+        Returns:
+            The created comment data with 201 status on success,
+            or validation errors with 400 status on failure.
+        """
         post = get_object_or_404(Post, slug=slug)
 
         serializer = CommentSerializer(data=request.data)
@@ -100,9 +168,22 @@ class PostCommentsAPIView(APIView):
 
 
 class CommentDeleteAPIView(APIView):
+    """API view for deleting a comment.
+
+    DELETE: Removes a comment. Only the comment author can delete it.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
+        """Delete a comment by ID.
+
+        Args:
+            id: The unique identifier of the comment.
+
+        Returns:
+            204 No Content on success, 403 Forbidden if not the author.
+        """
         comment = get_object_or_404(Comment, id=id)
 
         if comment.user != request.user:
@@ -116,9 +197,23 @@ class CommentDeleteAPIView(APIView):
 
 
 class LikePostAPIView(APIView):
+    """API view for liking a post.
+
+    POST: Adds a like to a post. Duplicate likes are ignored (idempotent).
+          Requires authentication.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slug):
+        """Like a post.
+
+        Args:
+            slug: The unique slug identifier of the post.
+
+        Returns:
+            Success message. Operation is idempotent.
+        """
         post = get_object_or_404(Post, slug=slug)
 
         Like.objects.get_or_create(
@@ -130,9 +225,23 @@ class LikePostAPIView(APIView):
 
 
 class UnlikePostAPIView(APIView):
+    """API view for unliking a post.
+
+    POST: Removes a like from a post. Requires authentication.
+          No error if the post was not previously liked.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slug):
+        """Remove a like from a post.
+
+        Args:
+            slug: The unique slug identifier of the post.
+
+        Returns:
+            Success message.
+        """
         post = get_object_or_404(Post, slug=slug)
 
         Like.objects.filter(
