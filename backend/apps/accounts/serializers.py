@@ -8,6 +8,7 @@ User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -50,8 +51,8 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get("password")
 
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist():
+            user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
             raise serializers.ValidationError("Invalid credentials.")
 
         user = authenticate(username=user.username, password=password)
