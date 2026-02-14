@@ -1,6 +1,8 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, status
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -20,12 +22,21 @@ from .serializers import (
 class PostListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
 
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    filterset_fields = {
+        "category__slug": ["exact"],
+    }
+
+    search_fields = ["title", "content"]
+    ordering_fields = ["created_at"]
+    ordering = ["-created_at"]
+
     def get_queryset(self):
         return (
             Post.objects.filter(is_published=True)
             .select_related("author", "category")
             .prefetch_related("tags")
-            .order_by("-created_at")
         )
 
     def get_permissions(self):
