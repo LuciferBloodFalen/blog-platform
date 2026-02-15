@@ -4,6 +4,10 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { AuthService } from '@/services';
 import { User, LoginRequest, RegisterRequest } from '@/types/api';
 
+// In-memory token storage
+let accessToken: string | null = null;
+let refreshToken: string | null = null;
+
 interface AuthContextType {
     user: User | null;
     loading: boolean;
@@ -12,6 +16,10 @@ interface AuthContextType {
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
     isAuthenticated: boolean;
+    getAccessToken: () => string | null;
+    getRefreshToken: () => string | null;
+    setTokens: (access: string, refresh: string) => void;
+    clearTokens: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,20 +28,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
+    // Token management functions
+    const getAccessToken = () => accessToken;
+    const getRefreshToken = () => refreshToken;
+
+    const setTokens = (access: string, refresh: string) => {
+        accessToken = access;
+        refreshToken = refresh;
+    };
+
+    const clearTokens = () => {
+        accessToken = null;
+        refreshToken = null;
+    };
+
     // Check for existing authentication on mount
     useEffect(() => {
         checkAuth();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const checkAuth = async () => {
         try {
-            const token = localStorage.getItem('authToken');
-            if (token) {
+            // For demo purposes, we could try to restore from localStorage on refresh
+            // but for production security, tokens should be in memory only
+            const storedToken = localStorage.getItem('authToken');
+            if (storedToken) {
+                accessToken = storedToken;
                 const userData = await AuthService.getCurrentUser();
                 setUser(userData);
             }
         } catch {
-            // Token might be invalid, remove it
+            // Token might be invalid, clear it
+            clearTokens();
             localStorage.removeItem('authToken');
         } finally {
             setLoading(false);
@@ -43,7 +70,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = async (credentials: LoginRequest) => {
         try {
             const response = await AuthService.login(credentials);
+            setTokens(response.access, response.refresh);
             setUser(response.user);
+
+            // For demo purposes, store in localStorage to persist across refreshes
+            // In production, consider using httpOnly cookies or session storage
+            localStorage.setItem('authToken', response.access);
         } catch (error) {
             throw error;
         }
@@ -52,7 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const register = async (userData: RegisterRequest) => {
         try {
             const response = await AuthService.register(userData);
+            setTokens(response.access, response.refresh);
             setUser(response.user);
+
+            // For demo purposes, store in localStorage to persist across refreshes
+            localStorage.setItem('authToken', response.access);
         } catch (error) {
             throw error;
         }
@@ -66,6 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Logout error:', error);
         } finally {
             setUser(null);
+            clearTokens();
             localStorage.removeItem('authToken');
         }
     };
@@ -77,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error('Failed to refresh user:', error);
             setUser(null);
+            clearTokens();
         }
     };
 
@@ -88,6 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         refreshUser,
         isAuthenticated: !!user,
+        getAccessToken,
+        getRefreshToken,
+        setTokens,
+        clearTokens,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

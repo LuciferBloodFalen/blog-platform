@@ -16,13 +16,35 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
 )
 
+
+def api_root(request):
+    """Root API endpoint providing basic info and available endpoints"""
+    return JsonResponse(
+        {
+            "message": "Blog Platform API",
+            "version": "1.0.0",
+            "status": "running",
+            "endpoints": {
+                "admin": "/admin/",
+                "api_docs": "/api/docs/",
+                "auth": "/api/auth/",
+                "posts": "/api/posts/",
+                "categories": "/api/categories/",
+                "tags": "/api/tags/",
+            },
+        }
+    )
+
+
 urlpatterns = [
+    path("", api_root, name="api_root"),
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema")),

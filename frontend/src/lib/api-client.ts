@@ -1,8 +1,32 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
+// We'll import the auth hook functions dynamically to avoid circular dependencies
+let getAccessToken: (() => string | null) | null = null;
+let getRefreshToken: (() => string | null) | null = null;
+let setTokens: ((access: string, refresh: string) => void) | null = null;
+let clearTokens: (() => void) | null = null;
+
+// Function to set auth functions from the auth hook
+export function setAuthFunctions(authFunctions: {
+    getAccessToken: () => string | null;
+    getRefreshToken: () => string | null;
+    setTokens: (access: string, refresh: string) => void;
+    clearTokens: () => void;
+}) {
+    getAccessToken = authFunctions.getAccessToken;
+    getRefreshToken = authFunctions.getRefreshToken;
+    setTokens = authFunctions.setTokens;
+    clearTokens = authFunctions.clearTokens;
+}
+
 // API Client Configuration
 class ApiClient {
     private instance: AxiosInstance;
+    private isRefreshing = false;
+    private failedQueue: Array<{
+        resolve: (value: string) => void;
+        reject: (error: unknown) => void;
+    }> = [];
 
     constructor() {
         this.instance = axios.create({
@@ -16,7 +40,7 @@ class ApiClient {
         // Request interceptor for adding auth token
         this.instance.interceptors.request.use(
             (config) => {
-                const token = this.getAuthToken();
+                const token = getAccessToken ? getAccessToken() : null;
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }
@@ -25,34 +49,100 @@ class ApiClient {
             (error) => Promise.reject(error)
         );
 
-        // Response interceptor for handling errors
+        // Response interceptor for handling token refresh
         this.instance.interceptors.response.use(
             (response) => response,
-            (error) => {
-                if (error.response?.status === 401) {
-                    // Handle unauthorized access
-                    this.removeAuthToken();
-                    // Optionally redirect to login
+            async (error) => {
+                const originalRequest = error.config;
+
+                // If it's a validation error (400) or other non-401 error, reject immediately
+                if (error.response?.status !== 401) {
+                    return Promise.reject(error);
                 }
+
+                if (error.response?.status === 401 && !originalRequest._retry) {
+                    if (this.isRefreshing) {
+                        // If already refreshing, queue the request
+                        return new Promise((resolve, reject) => {
+                            this.failedQueue.push({ resolve, reject });
+                        })
+                            .then((token) => {
+                                originalRequest.headers.Authorization = `Bearer ${token}`;
+                                return this.instance(originalRequest);
+                            })
+                            .catch((err) => Promise.reject(err));
+                    }
+
+                    originalRequest._retry = true;
+                    this.isRefreshing = true;
+
+                    try {
+                        const refreshTokenValue = getRefreshToken
+                            ? getRefreshToken()
+                            : null;
+                        if (!refreshTokenValue) {
+                            throw new Error('No refresh token available');
+                        }
+
+                        // Call refresh endpoint
+                        const response = await this.instance.post('/auth/refresh/', {
+                            refresh: refreshTokenValue,
+                        });
+
+                        const { access, refresh } = response.data;
+
+                        // Update tokens
+                        if (setTokens) {
+                            setTokens(access, refresh);
+                        }
+
+                        // Process queued requests
+                        this.processQueue(null, access);
+
+                        // Retry original request
+                        originalRequest.headers.Authorization = `Bearer ${access}`;
+                        return this.instance(originalRequest);
+                    } catch (refreshError) {
+                        // Refresh failed, clear tokens and redirect to login
+                        this.processQueue(refreshError, null);
+
+                        if (clearTokens) {
+                            clearTokens();
+                        }
+
+                        // Clear localStorage as well for demo purposes
+                        if (typeof window !== 'undefined') {
+                            localStorage.removeItem('authToken');
+                            // Redirect to login page
+                            window.location.href = '/login';
+                        }
+
+                        return Promise.reject(refreshError);
+                    } finally {
+                        this.isRefreshing = false;
+                    }
+                }
+
                 return Promise.reject(error);
             }
         );
     }
 
-    private getAuthToken(): string | null {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('authToken');
-        }
-        return null;
-    }
+    private processQueue(error: unknown, token: string | null) {
+        this.failedQueue.forEach(({ resolve, reject }) => {
+            if (error) {
+                reject(error);
+            } else if (token) {
+                resolve(token);
+            }
+        });
 
-    private removeAuthToken(): void {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('authToken');
-        }
+        this.failedQueue = [];
     }
 
     public setAuthToken(token: string): void {
+        // This method is kept for backward compatibility
+        // but tokens are now managed by the auth hook
         if (typeof window !== 'undefined') {
             localStorage.setItem('authToken', token);
         }

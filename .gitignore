@@ -9,3 +9,6 @@ Docker-Help.txt
 .vscode/
 
 Frontend-Notes.txt
+scripts/
+backend.log
+frontend.log
