@@ -106,6 +106,7 @@ class LoginSerializer(serializers.Serializer):
                 "username": user.username,
                 "email": user.email,
                 "is_author": user.is_author,
+                "created_at": user.created_at,
             },
         }
 
