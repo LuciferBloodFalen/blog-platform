@@ -96,7 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const logout = async () => {
         try {
-            await AuthService.logout();
+            const refreshTokenValue = getRefreshToken();
+            await AuthService.logout(refreshTokenValue);
         } catch (error) {
             // Even if logout fails on server, clear local state
             console.error('Logout error:', error);

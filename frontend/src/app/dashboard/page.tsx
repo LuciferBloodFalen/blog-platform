@@ -111,14 +111,6 @@ function DashboardContent() {
                             <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                                 <div>
                                     <dt className="text-sm font-medium text-gray-500">
-                                        User ID
-                                    </dt>
-                                    <dd className="mt-1 text-sm text-gray-900">
-                                        #{user?.id}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-sm font-medium text-gray-500">
                                         Username
                                     </dt>
                                     <dd className="mt-1 text-sm text-gray-900">
@@ -131,19 +123,6 @@ function DashboardContent() {
                                 </div>
                                 <div>
                                     <dt className="text-sm font-medium text-gray-500">
-                                        Author Status
-                                    </dt>
-                                    <dd className="mt-1 text-sm text-gray-900">
-                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user?.is_author
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-800'
-                                            }`}>
-                                            {user?.is_author ? 'Author' : 'Member'}
-                                        </span>
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-sm font-medium text-gray-500">
                                         Member Since
                                     </dt>
                                     <dd className="mt-1 text-sm text-gray-900">
@@ -153,25 +132,6 @@ function DashboardContent() {
                                                 month: 'long',
                                                 day: 'numeric'
                                             })
-                                            : 'N/A'}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-sm font-medium text-gray-500">
-                                        Account Age
-                                    </dt>
-                                    <dd className="mt-1 text-sm text-gray-900">
-                                        {user?.created_at
-                                            ? (() => {
-                                                const createdDate = new Date(user.created_at);
-                                                const now = new Date();
-                                                const diffTime = Math.abs(now.getTime() - createdDate.getTime());
-                                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                                if (diffDays === 1) return '1 day';
-                                                if (diffDays < 30) return `${diffDays} days`;
-                                                if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
-                                                return `${Math.floor(diffDays / 365)} years`;
-                                            })()
                                             : 'N/A'}
                                     </dd>
                                 </div>

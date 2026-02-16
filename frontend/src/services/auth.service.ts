@@ -32,8 +32,16 @@ export class AuthService {
     return response;
   }
 
-  static async logout(): Promise<void> {
-    await apiClient.post(`${this.BASE_PATH}/logout/`);
+  static async logout(refreshToken?: string | null): Promise<void> {
+    if (refreshToken) {
+      try {
+        await apiClient.post(`${this.BASE_PATH}/logout/`, { refresh: refreshToken });
+      } catch (error) {
+        // Even if logout fails, continue with cleanup
+        console.warn('Server logout failed:', error);
+      }
+    }
+
     // Remove token from storage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('authToken');
