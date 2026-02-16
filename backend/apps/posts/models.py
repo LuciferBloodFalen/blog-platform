@@ -1,5 +1,8 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 
 
 class Category(models.Model):
@@ -20,7 +23,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, editable=False)
 
     content = models.TextField()
 
@@ -42,6 +45,26 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:  # Only generate slug if not already set (immutable)
+            self.slug = self._generate_unique_slug()
+        super().save(*args, **kwargs)
+
+    def _generate_unique_slug(self):
+        """Generate a unique slug from title with random suffix if needed."""
+        base_slug = slugify(self.title)[:50]  # Limit base slug length
+
+        # If base slug is unique, use it
+        if not Post.objects.filter(slug=base_slug).exists():
+            return base_slug
+
+        # Generate slug with random suffix
+        while True:
+            random_suffix = str(uuid.uuid4().hex)[:8]
+            unique_slug = f"{base_slug}-{random_suffix}"
+            if not Post.objects.filter(slug=unique_slug).exists():
+                return unique_slug
 
     def __str__(self):
         return self.title

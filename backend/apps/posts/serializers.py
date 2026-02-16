@@ -10,7 +10,8 @@ class PostSerializer(serializers.ModelSerializer):
         max_length=255, help_text="The title of the blog post (max 255 characters)."
     )
     slug = serializers.SlugField(
-        help_text="URL-friendly identifier for the post. Must be unique."
+        read_only=True,
+        help_text="URL-friendly identifier for the post. Auto-generated from title.",
     )
     content = serializers.CharField(help_text="The main body content of the blog post.")
     author = serializers.ReadOnlyField(
@@ -52,7 +53,7 @@ class PostSerializer(serializers.ModelSerializer):
             "updated_at",
             "likes_count",
         ]
-        read_only_fields = ("created_at", "updated_at")
+        read_only_fields = ("created_at", "updated_at", "slug")
         extra_kwargs = {
             "created_at": {
                 "help_text": "Timestamp when the post was created (read-only)."
