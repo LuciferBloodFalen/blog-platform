@@ -109,6 +109,12 @@ function DashboardContent() {
                         </div>
                         <div className="flex space-x-4">
                             <button
+                                onClick={() => window.location.href = '/'}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Home
+                            </button>
+                            <button
                                 onClick={handleLogout}
                                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                             >
@@ -123,8 +129,8 @@ function DashboardContent() {
                             <button
                                 onClick={() => setCurrentView('overview')}
                                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${currentView === 'overview'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Overview
@@ -132,8 +138,8 @@ function DashboardContent() {
                             <button
                                 onClick={() => setCurrentView('posts')}
                                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${currentView === 'posts'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 My Posts
@@ -141,8 +147,8 @@ function DashboardContent() {
                             <button
                                 onClick={handleCreatePost}
                                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${currentView === 'create-post' || currentView === 'edit-post'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 {currentView === 'edit-post' ? 'Edit Post' : 'Create Post'}

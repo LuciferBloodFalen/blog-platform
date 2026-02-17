@@ -29,7 +29,7 @@ export function PostCard({ post }: PostCardProps) {
             <div className="p-6">
                 <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
                     <span>{formatDate(post.published_at || post.created_at)}</span>
-                    <span>by {post.author.username}</span>
+                    <span>by {post.author}</span>
                     {post.likes_count !== undefined && (
                         <span className="flex items-center space-x-1">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

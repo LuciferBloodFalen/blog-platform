@@ -3,6 +3,7 @@ import { PostCard } from '@/components/PostCard';
 import { Pagination } from '@/components/Pagination';
 import { ServerApiClient } from '@/lib/server-api-client';
 import { Suspense } from 'react';
+import { HomePageClient } from '@/components/HomePageClient';
 
 interface HomePageProps {
   searchParams: {
@@ -111,36 +112,7 @@ async function PostsList({ searchParams }: { searchParams: HomePageProps['search
 
 export default function Home({ searchParams }: HomePageProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
-                  Blog Platform
-                </Link>
-              </h1>
-            </div>
-            <nav className="flex space-x-4">
-              <Link
-                href="/login"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <HomePageClient>
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
@@ -167,6 +139,6 @@ export default function Home({ searchParams }: HomePageProps) {
           </div>
         </div>
       </footer>
-    </div>
+    </HomePageClient>
   );
 }

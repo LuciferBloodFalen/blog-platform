@@ -27,7 +27,7 @@ export interface Tag {
 export interface Comment {
   id: number;
   content: string;
-  user: User;
+  user: string; // Username as string
   post: number;
   created_at: string;
 }
@@ -47,7 +47,7 @@ export interface Post {
   excerpt?: string;
   featured_image?: string;
   status: 'draft' | 'published' | 'archived';
-  author: User;
+  author: string; // Author username as string
   categories: Category[];
   tags: Tag[];
   comments?: Comment[];

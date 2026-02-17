@@ -71,8 +71,6 @@ export class ServerApiClient {
 
         const data = await response.json();
         console.log(`[ServerApiClient] Received post data for: ${data.slug}`);
-        console.log('[ServerApiClient] Full post data structure:', JSON.stringify(data, null, 2));
-        console.log('[ServerApiClient] Author data:', data.author);
         return data;
     }
 

@@ -77,7 +77,7 @@ export default function ApiExamplePage() {
             <div key={post.id} className="border rounded-lg p-4">
               <h3 className="font-medium text-lg">{post.title}</h3>
               <p className="text-gray-600 text-sm mb-2">
-                by {post.author.username} •{' '}
+                by {post.author} •{' '}
                 {new Date(post.created_at).toLocaleDateString()}
               </p>
               {post.excerpt && <p className="text-gray-700">{post.excerpt}</p>}
