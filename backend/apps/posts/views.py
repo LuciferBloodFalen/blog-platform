@@ -42,6 +42,7 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
 
     filterset_fields = {
         "category__slug": ["exact"],
+        "tags__slug": ["exact"],
     }
 
     search_fields = ["title", "content"]
@@ -84,6 +85,7 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """Return posts based on user authentication status.
 
+        For public access, only return published posts.
         Authenticated users can see their own drafts plus all published posts.
         Anonymous users can only see published posts.
         """
@@ -97,7 +99,13 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
                 .order_by("-created_at")
             )
 
-        return Post.objects.filter(is_published=True)
+        # For anonymous users, only show published posts
+        return (
+            Post.objects.filter(is_published=True)
+            .select_related("author", "category")
+            .prefetch_related("tags")
+            .order_by("-created_at")
+        )
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):

@@ -5,15 +5,19 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 
 interface PostPageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 // Metadata for SEO
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+    const resolvedParams = await params;
+    console.log('🔍 generateMetadata called with slug:', resolvedParams.slug);
+
     try {
-        const post = await ServerApiClient.fetchPostBySlug(params.slug);
+        const post = await ServerApiClient.fetchPostBySlug(resolvedParams.slug);
+        console.log('✅ Successfully fetched post for metadata:', post.title);
 
         return {
             title: `${post.title} | Blog Platform`,
@@ -23,7 +27,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
                 description: post.excerpt || post.content.substring(0, 160),
                 type: 'article',
                 publishedTime: post.published_at || post.created_at,
-                authors: [post.author.username],
+                authors: post.author?.username ? [post.author.username] : ['Unknown Author'],
                 images: post.featured_image ? [{ url: post.featured_image }] : [],
             },
             twitter: {
@@ -34,6 +38,9 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
             },
         };
     } catch (error) {
+        console.error('❌ Error fetching post for metadata:', error);
+        console.error('❌ Metadata error for slug:', resolvedParams.slug);
+
         return {
             title: 'Post Not Found | Blog Platform',
             description: 'The requested post could not be found.',
@@ -59,11 +66,17 @@ function PostLoading() {
 }
 
 async function PostContent({ slug }: { slug: string }) {
+    console.log('🔍 PostContent component attempting to fetch post with slug:', slug);
+
     try {
         const post = await ServerApiClient.fetchPostBySlug(slug);
+        console.log('✅ Successfully fetched post:', post.title);
+        console.log('🔍 Post author data:', post.author);
+        console.log('🔍 Full post structure keys:', Object.keys(post));
 
         // Check if post is published
         if (post.status !== 'published') {
+            console.log('❌ Post is not published, status:', post.status);
             notFound();
         }
 
@@ -102,11 +115,11 @@ async function PostContent({ slug }: { slug: string }) {
                             <div className="flex items-center space-x-3">
                                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                                     <span className="text-blue-600 font-semibold text-lg">
-                                        {post.author.username.charAt(0).toUpperCase()}
+                                        {post.author?.username?.charAt(0)?.toUpperCase() || '?'}
                                     </span>
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-900">{post.author.username}</p>
+                                    <p className="font-medium text-gray-900">{post.author?.username || 'Unknown Author'}</p>
                                     <p className="text-sm text-gray-500">
                                         {formatDate(post.published_at || post.created_at)}
                                         {' at '}
@@ -213,11 +226,11 @@ async function PostContent({ slug }: { slug: string }) {
                                     <div className="flex items-center space-x-3 mb-3">
                                         <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                                             <span className="text-gray-600 font-medium text-sm">
-                                                {comment.user.username.charAt(0).toUpperCase()}
+                                                {comment.user?.username?.charAt(0)?.toUpperCase() || '?'}
                                             </span>
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-900">{comment.user.username}</p>
+                                            <p className="font-medium text-gray-900">{comment.user?.username || 'Unknown User'}</p>
                                             <p className="text-sm text-gray-500">
                                                 {formatDate(comment.created_at)}
                                             </p>
@@ -242,12 +255,17 @@ async function PostContent({ slug }: { slug: string }) {
             </>
         );
     } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error('❌ Error fetching post in PostContent component:', error);
+        console.error('❌ Attempted to fetch slug:', slug);
         notFound();
     }
 }
 
-export default function PostPage({ params }: PostPageProps) {
+export default async function PostPage({ params }: PostPageProps) {
+    const resolvedParams = await params;
+    console.log('🏃 PostPage component rendered with slug:', resolvedParams.slug);
+    console.log('🔍 Full resolved params:', resolvedParams);
+
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
@@ -280,7 +298,7 @@ export default function PostPage({ params }: PostPageProps) {
             {/* Main Content */}
             <main className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <Suspense fallback={<PostLoading />}>
-                    <PostContent slug={params.slug} />
+                    <PostContent slug={resolvedParams.slug} />
                 </Suspense>
             </main>
 

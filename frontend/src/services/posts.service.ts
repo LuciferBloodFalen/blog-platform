@@ -29,7 +29,7 @@ export class PostsService {
   }
 
   static async getPostBySlug(slug: string): Promise<Post> {
-    return await apiClient.get<Post>(`${this.BASE_PATH}/slug/${slug}/`);
+    return await apiClient.get<Post>(`${this.BASE_PATH}/${slug}/`);
   }
 
   static async createPost(postData: CreatePostRequest): Promise<Post> {
