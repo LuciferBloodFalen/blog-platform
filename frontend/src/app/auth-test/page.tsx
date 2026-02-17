@@ -51,8 +51,6 @@ export default function AuthTestPage() {
                 username: testCredentials.username,
                 email: testCredentials.email,
                 password: testCredentials.password,
-                first_name: 'Test',
-                last_name: 'User',
             });
             addTestResult('✅ Registration successful');
         } catch (error) {
@@ -132,7 +130,7 @@ export default function AuthTestPage() {
                                     User: {user.username} ({user.email})
                                 </p>
                                 <p>
-                                    Name: {user.first_name} {user.last_name}
+                                    Author Status: {user.is_author ? 'Author' : 'Member'}
                                 </p>
                             </div>
                         )}

@@ -250,3 +250,26 @@ class UnlikePostAPIView(APIView):
         ).delete()
 
         return Response({"message": "Post unliked"})
+
+
+class MyPostsListAPIView(generics.ListAPIView):
+    """API view for listing the authenticated user's posts.
+
+    GET: Returns a paginated list of posts created by the authenticated user,
+         including both published and draft posts.
+    """
+
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["title", "content"]
+    ordering_fields = ["created_at", "updated_at"]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        """Return posts created by the authenticated user."""
+        return (
+            Post.objects.filter(author=self.request.user)
+            .select_related("author", "category")
+            .prefetch_related("tags")
+        )

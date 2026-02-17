@@ -3,10 +3,8 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  is_author: boolean;
   created_at: string;
-  updated_at: string;
 }
 
 export interface Category {
@@ -26,6 +24,21 @@ export interface Tag {
   updated_at: string;
 }
 
+export interface Comment {
+  id: number;
+  content: string;
+  user: User;
+  post: number;
+  created_at: string;
+}
+
+export interface Like {
+  id: number;
+  user: User;
+  post: number;
+  created_at: string;
+}
+
 export interface Post {
   id: number;
   title: string;
@@ -37,6 +50,10 @@ export interface Post {
   author: User;
   categories: Category[];
   tags: Tag[];
+  comments?: Comment[];
+  comments_count?: number;
+  likes?: Like[];
+  likes_count?: number;
   created_at: string;
   updated_at: string;
   published_at?: string;
@@ -77,11 +94,10 @@ export interface AuthResponse {
 export interface CreatePostRequest {
   title: string;
   content: string;
-  excerpt?: string;
-  status?: 'draft' | 'published';
-  categories?: number[];
+  is_published?: boolean;
+  category?: number;
   tags?: number[];
-  featured_image?: string;
+  tags_input?: number[];
 }
 
 export type UpdatePostRequest = Partial<CreatePostRequest>;

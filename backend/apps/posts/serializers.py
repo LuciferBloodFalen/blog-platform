@@ -23,15 +23,25 @@ class PostSerializer(serializers.ModelSerializer):
         allow_null=True,
         help_text="ID of the category this post belongs to.",
     )
-    tags = serializers.PrimaryKeyRelatedField(
+    categories = serializers.SerializerMethodField(
+        help_text="List of categories for this post."
+    )
+    tags = serializers.SerializerMethodField(
+        help_text="List of tags associated with this post."
+    )
+    tags_input = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
         required=False,
-        help_text="List of tag IDs associated with this post.",
+        write_only=True,
+        help_text="List of tag IDs to associate with this post (write-only).",
     )
     is_published = serializers.BooleanField(
         default=False,
         help_text="Whether the post is publicly visible. Defaults to false (draft).",
+    )
+    status = serializers.SerializerMethodField(
+        help_text="Post status: draft, published, or archived."
     )
     likes_count = serializers.IntegerField(
         source="likes.count",
@@ -39,21 +49,75 @@ class PostSerializer(serializers.ModelSerializer):
         help_text="Total number of likes on this post (read-only).",
     )
 
+    def get_categories(self, obj):
+        """Return category as a list for frontend compatibility."""
+        if obj.category:
+            return [
+                {
+                    "id": obj.category.id,
+                    "name": obj.category.name,
+                    "slug": obj.category.slug,
+                }
+            ]
+        return []
+
+    def get_tags(self, obj):
+        """Return tags with full data for frontend."""
+        return [
+            {"id": tag.id, "name": tag.name, "slug": tag.slug} for tag in obj.tags.all()
+        ]
+
+    def get_status(self, obj):
+        """Return status based on is_published field."""
+        return "published" if obj.is_published else "draft"
+
+    def create(self, validated_data):
+        """Handle tags during creation."""
+        tags_data = validated_data.pop("tags_input", [])
+        post = Post.objects.create(**validated_data)
+        post.tags.set(tags_data)
+        return post
+
+    def update(self, instance, validated_data):
+        """Handle tags during update."""
+        tags_data = validated_data.pop("tags_input", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if tags_data is not None:
+            instance.tags.set(tags_data)
+
+        return instance
+
     class Meta:
         model = Post
         fields = [
+            "id",
             "title",
             "slug",
             "content",
             "author",
             "category",
+            "categories",
             "tags",
+            "tags_input",
             "is_published",
+            "status",
             "created_at",
             "updated_at",
             "likes_count",
         ]
-        read_only_fields = ("created_at", "updated_at", "slug")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "slug",
+            "categories",
+            "status",
+            "tags",
+        )
         extra_kwargs = {
             "created_at": {
                 "help_text": "Timestamp when the post was created (read-only)."
@@ -83,30 +147,86 @@ class PostDetailSerializer(serializers.ModelSerializer):
         allow_null=True,
         help_text="ID of the category this post belongs to.",
     )
-    tags = serializers.PrimaryKeyRelatedField(
+    categories = serializers.SerializerMethodField(
+        help_text="List of categories for this post."
+    )
+    tags = serializers.SerializerMethodField(
+        help_text="List of tags associated with this post."
+    )
+    tags_input = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
         required=False,
-        help_text="List of tag IDs associated with this post.",
+        write_only=True,
+        help_text="List of tag IDs to associate with this post (write-only).",
     )
     is_published = serializers.BooleanField(
         default=False, help_text="Whether the post is publicly visible."
     )
+    status = serializers.SerializerMethodField(
+        help_text="Post status: draft, published, or archived."
+    )
+
+    def get_categories(self, obj):
+        """Return category as a list for frontend compatibility."""
+        if obj.category:
+            return [
+                {
+                    "id": obj.category.id,
+                    "name": obj.category.name,
+                    "slug": obj.category.slug,
+                }
+            ]
+        return []
+
+    def get_tags(self, obj):
+        """Return tags with full data for frontend."""
+        return [
+            {"id": tag.id, "name": tag.name, "slug": tag.slug} for tag in obj.tags.all()
+        ]
+
+    def get_status(self, obj):
+        """Return status based on is_published field."""
+        return "published" if obj.is_published else "draft"
+
+    def update(self, instance, validated_data):
+        """Handle tags during update."""
+        tags_data = validated_data.pop("tags_input", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if tags_data is not None:
+            instance.tags.set(tags_data)
+
+        return instance
 
     class Meta:
         model = Post
         fields = [
+            "id",
             "title",
             "slug",
             "content",
             "author",
             "category",
+            "categories",
             "tags",
+            "tags_input",
             "is_published",
+            "status",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ("created_at", "updated_at")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "categories",
+            "status",
+            "tags",
+        )
         extra_kwargs = {
             "created_at": {
                 "help_text": "Timestamp when the post was created (read-only)."

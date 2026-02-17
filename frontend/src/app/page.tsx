@@ -1,19 +1,115 @@
-'use client';
-
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { PostCard } from '@/components/PostCard';
+import { Pagination } from '@/components/Pagination';
+import { ServerApiClient } from '@/lib/server-api-client';
+import { Suspense } from 'react';
 
-export default function Home() {
-  const { isAuthenticated, user, loading, logout } = useAuth();
+interface HomePageProps {
+  searchParams: {
+    page?: string;
+    search?: string;
+    category?: string;
+    tag?: string;
+  };
+}
 
-  if (loading) {
+function PostsLoading() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="bg-white rounded-lg shadow-md animate-pulse">
+          <div className="aspect-video bg-gray-300 rounded-t-lg"></div>
+          <div className="p-6 space-y-3">
+            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-300 rounded"></div>
+              <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+async function PostsList({ searchParams }: { searchParams: HomePageProps['searchParams'] }) {
+  const currentPage = parseInt(searchParams.page || '1', 10);
+  const pageSize = 12;
+
+  try {
+    const postsData = await ServerApiClient.fetchPublishedPosts({
+      page: currentPage,
+      page_size: pageSize,
+      search: searchParams.search,
+      category: searchParams.category,
+      tag: searchParams.tag,
+    });
+
+    const totalPages = Math.ceil(postsData.count / pageSize);
+
+    if (postsData.results.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+          <p className="text-gray-600">
+            {searchParams.search || searchParams.category || searchParams.tag
+              ? 'Try adjusting your search criteria.'
+              : 'Check back later for new posts.'}
+          </p>
+        </div>
+      );
+    }
+
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {postsData.results.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              hasNext={!!postsData.next}
+              hasPrevious={!!postsData.previous}
+            />
+          </div>
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+
+    return (
+      <div className="text-center py-12">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+          <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load posts</h3>
+        <p className="text-gray-600 mb-4">There was an error loading the posts. Please try again later.</p>
+        <Link
+          href="/"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Refresh Page
+        </Link>
       </div>
     );
   }
+}
 
+export default function Home({ searchParams }: HomePageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -22,178 +118,55 @@ export default function Home() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Blog Platform
+                <Link href="/" className="hover:text-blue-600 transition-colors">
+                  Blog Platform
+                </Link>
               </h1>
             </div>
-            <div className="flex space-x-4">
-              {isAuthenticated ? (
-                <>
-                  <span className="text-gray-600">
-                    Welcome, {user?.first_name || user?.username}!
-                  </span>
-                  <Link
-                    href="/dashboard"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              )}
-            </div>
+            <nav className="flex space-x-4">
+              <Link
+                href="/login"
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+              >
+                Sign Up
+              </Link>
+            </nav>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+        {/* Page Header */}
+        <div className="text-center mb-12">
           <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-            Welcome to Blog Platform
+            Latest Posts
           </h2>
           <p className="mt-4 text-xl text-gray-600">
-            A modern, full-stack blogging platform built with Next.js and Django
+            Discover articles, insights, and stories from our community
           </p>
-
-          <div className="mt-8 flex justify-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Go to Dashboard
-                </Link>
-                <Link
-                  href="/api-example"
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-green-700 transition-colors"
-                >
-                  API Examples
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/register"
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Get Started
-                </Link>
-                <Link
-                  href="/login"
-                  className="bg-gray-200 text-gray-900 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-300 transition-colors"
-                >
-                  Sign In
-                </Link>
-              </>
-            )}
-          </div>
         </div>
 
-        {/* Feature Cards */}
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
-              <span className="text-blue-600 text-xl">🔐</span>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Secure Authentication
-            </h3>
-            <p className="text-gray-600">
-              JWT token-based authentication with automatic refresh and memory
-              storage
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg mb-4">
-              <span className="text-green-600 text-xl">⚡</span>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Modern Stack
-            </h3>
-            <p className="text-gray-600">
-              Built with Next.js 16, TypeScript, Tailwind CSS, and Django REST
-              Framework
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg mb-4">
-              <span className="text-purple-600 text-xl">🚀</span>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Type-Safe API
-            </h3>
-            <p className="text-gray-600">
-              Comprehensive API integration with TypeScript interfaces and error
-              handling
-            </p>
-          </div>
-        </div>
-
-        {/* Authentication Status */}
-        <div className="mt-16 bg-white rounded-lg shadow-md p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Authentication Status
-          </h3>
-          {isAuthenticated ? (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                <span className="text-green-700 font-medium">
-                  Authenticated
-                </span>
-              </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-900 mb-2">
-                  User Information:
-                </h4>
-                <ul className="text-green-800 space-y-1">
-                  <li>Username: {user?.username}</li>
-                  <li>Email: {user?.email}</li>
-                  <li>
-                    Name: {user?.first_name} {user?.last_name}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 bg-gray-400 rounded-full"></span>
-                <span className="text-gray-600">Not authenticated</span>
-              </div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <p className="text-gray-700">
-                  Please sign in to access protected features and your
-                  dashboard.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Posts Section */}
+        <Suspense fallback={<PostsLoading />}>
+          <PostsList searchParams={searchParams} />
+        </Suspense>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-gray-600">
+            <p>&copy; {new Date().getFullYear()} Blog Platform. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
