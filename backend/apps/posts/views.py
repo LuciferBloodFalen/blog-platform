@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, status
@@ -83,27 +82,16 @@ class PostRetrieveUpdateDeleteAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
-        """Return posts based on user authentication status.
+        """Return all posts for individual post retrieval.
 
-        For public access, only return published posts.
-        Authenticated users can see their own drafts plus all published posts.
-        Anonymous users can only see published posts.
+        Since access is controlled by knowing the slug, we allow viewing
+        any post by slug regardless of published status or author.
+        This enables proper viewing of draft posts from the dashboard.
         """
-        user = self.request.user
-
-        if user.is_authenticated:
-            return (
-                Post.objects.filter(Q(is_published=True) | Q(author=user))
-                .select_related("author", "category")
-                .prefetch_related("tags")
-                .order_by("-created_at")
-            )
-
-        # For anonymous users, only show published posts
         return (
-            Post.objects.filter(is_published=True)
+            Post.objects.all()
             .select_related("author", "category")
-            .prefetch_related("tags")
+            .prefetch_related("tags", "comments")
             .order_by("-created_at")
         )
 
@@ -220,16 +208,26 @@ class LikePostAPIView(APIView):
             slug: The unique slug identifier of the post.
 
         Returns:
-            Success message. Operation is idempotent.
+            Success message with current like status and count.
         """
         post = get_object_or_404(Post, slug=slug)
 
-        Like.objects.get_or_create(
+        like, created = Like.objects.get_or_create(
             post=post,
             user=request.user,
         )
 
-        return Response({"message": "Post liked"})
+        # Get current total likes count
+        total_likes = post.likes.count()
+
+        return Response(
+            {
+                "message": "Post liked" if created else "Post already liked",
+                "liked": True,
+                "likes_count": total_likes,
+                "was_created": created,
+            }
+        )
 
 
 class UnlikePostAPIView(APIView):
@@ -248,16 +246,60 @@ class UnlikePostAPIView(APIView):
             slug: The unique slug identifier of the post.
 
         Returns:
-            Success message.
+            Success message with current like status and count.
         """
         post = get_object_or_404(Post, slug=slug)
 
-        Like.objects.filter(
+        deleted_count, _ = Like.objects.filter(
             post=post,
             user=request.user,
         ).delete()
 
-        return Response({"message": "Post unliked"})
+        # Get current total likes count
+        total_likes = post.likes.count()
+
+        return Response(
+            {
+                "message": "Post unliked"
+                if deleted_count > 0
+                else "Post was not liked",
+                "liked": False,
+                "likes_count": total_likes,
+                "was_removed": deleted_count > 0,
+            }
+        )
+
+
+class PostLikeStatusAPIView(APIView):
+    """API view for checking if user has liked a post.
+
+    GET: Returns current like status and total likes count.
+         Authentication optional - returns liked: false for anonymous users.
+    """
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, slug):
+        """Get like status for a post.
+
+        Args:
+            slug: The unique slug identifier of the post.
+
+        Returns:
+            Current like status and count for the user.
+        """
+        post = get_object_or_404(Post, slug=slug)
+
+        # Check if user has liked this post
+        if request.user.is_authenticated:
+            liked = Like.objects.filter(post=post, user=request.user).exists()
+        else:
+            liked = False
+
+        # Get total likes count
+        likes_count = post.likes.count()
+
+        return Response({"liked": liked, "likes_count": likes_count})
 
 
 class MyPostsListAPIView(generics.ListAPIView):

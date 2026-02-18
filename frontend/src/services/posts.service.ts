@@ -37,22 +37,22 @@ export class PostsService {
   }
 
   static async updatePost(
-    id: number,
+    slug: string,
     postData: UpdatePostRequest
   ): Promise<Post> {
-    return await apiClient.patch<Post>(`${this.BASE_PATH}/${id}/`, postData);
+    return await apiClient.patch<Post>(`${this.BASE_PATH}/${slug}/`, postData);
   }
 
-  static async deletePost(id: number): Promise<void> {
-    await apiClient.delete(`${this.BASE_PATH}/${id}/`);
+  static async deletePost(slug: string): Promise<void> {
+    await apiClient.delete(`${this.BASE_PATH}/${slug}/`);
   }
 
-  static async publishPost(id: number): Promise<Post> {
-    return await apiClient.patch<Post>(`${this.BASE_PATH}/${id}/publish/`);
+  static async publishPost(slug: string): Promise<Post> {
+    return await apiClient.patch<Post>(`${this.BASE_PATH}/${slug}/publish/`);
   }
 
-  static async unpublishPost(id: number): Promise<Post> {
-    return await apiClient.patch<Post>(`${this.BASE_PATH}/${id}/unpublish/`);
+  static async unpublishPost(slug: string): Promise<Post> {
+    return await apiClient.patch<Post>(`${this.BASE_PATH}/${slug}/unpublish/`);
   }
 
   static async getFeaturedPosts(): Promise<Post[]> {

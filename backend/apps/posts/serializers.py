@@ -48,6 +48,11 @@ class PostSerializer(serializers.ModelSerializer):
         read_only=True,
         help_text="Total number of likes on this post (read-only).",
     )
+    comments_count = serializers.IntegerField(
+        source="comments.count",
+        read_only=True,
+        help_text="Total number of comments on this post (read-only).",
+    )
 
     def get_categories(self, obj):
         """Return category as a list for frontend compatibility."""
@@ -108,6 +113,7 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "likes_count",
+            "comments_count",
         ]
         read_only_fields = (
             "id",
@@ -117,6 +123,8 @@ class PostSerializer(serializers.ModelSerializer):
             "categories",
             "status",
             "tags",
+            "likes_count",
+            "comments_count",
         )
         extra_kwargs = {
             "created_at": {
@@ -166,6 +174,19 @@ class PostDetailSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField(
         help_text="Post status: draft, published, or archived."
     )
+    likes_count = serializers.IntegerField(
+        source="likes.count",
+        read_only=True,
+        help_text="Total number of likes on this post (read-only).",
+    )
+    comments_count = serializers.IntegerField(
+        source="comments.count",
+        read_only=True,
+        help_text="Total number of comments on this post (read-only).",
+    )
+    comments = serializers.SerializerMethodField(
+        help_text="List of comments for this post, ordered by creation date (newest first)."
+    )
 
     def get_categories(self, obj):
         """Return category as a list for frontend compatibility."""
@@ -188,6 +209,11 @@ class PostDetailSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         """Return status based on is_published field."""
         return "published" if obj.is_published else "draft"
+
+    def get_comments(self, obj):
+        """Return comments for this post, ordered by newest first."""
+        comments = obj.comments.all().order_by("-created_at")
+        return CommentSerializer(comments, many=True).data
 
     def update(self, instance, validated_data):
         """Handle tags during update."""
@@ -216,6 +242,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "tags_input",
             "is_published",
             "status",
+            "likes_count",
+            "comments_count",
+            "comments",
             "created_at",
             "updated_at",
         ]
@@ -226,6 +255,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "categories",
             "status",
             "tags",
+            "likes_count",
+            "comments_count",
+            "comments",
         )
         extra_kwargs = {
             "created_at": {

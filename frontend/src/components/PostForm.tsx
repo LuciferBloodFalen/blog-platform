@@ -75,7 +75,7 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
 
             let savedPost: Post;
             if (isEditing && post) {
-                savedPost = await PostsService.updatePost(post.id, postData);
+                savedPost = await PostsService.updatePost(post.slug, postData);
             } else {
                 savedPost = await PostsService.createPost(postData as CreatePostRequest);
             }

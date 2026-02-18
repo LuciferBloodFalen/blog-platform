@@ -22,7 +22,7 @@ export function DeleteModal({ post, isOpen, onClose, onSuccess }: DeleteModalPro
             setLoading(true);
             setError('');
 
-            await PostsService.deletePost(post.id);
+            await PostsService.deletePost(post.slug);
             onSuccess();
             onClose();
         } catch (err) {

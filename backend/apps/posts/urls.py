@@ -5,6 +5,7 @@ from .views import (
     LikePostAPIView,
     MyPostsListAPIView,
     PostCommentsAPIView,
+    PostLikeStatusAPIView,
     PostListCreateAPIView,
     PostRetrieveUpdateDeleteAPIView,
     UnlikePostAPIView,
@@ -18,4 +19,9 @@ urlpatterns = [
     path("comments/<int:id>/", CommentDeleteAPIView.as_view(), name="comment-delete"),
     path("<slug:slug>/like/", LikePostAPIView.as_view(), name="post-like"),
     path("<slug:slug>/unlike/", UnlikePostAPIView.as_view(), name="post-unlike"),
+    path(
+        "<slug:slug>/like-status/",
+        PostLikeStatusAPIView.as_view(),
+        name="post-like-status",
+    ),
 ]

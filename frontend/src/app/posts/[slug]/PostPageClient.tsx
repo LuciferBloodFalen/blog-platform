@@ -39,13 +39,6 @@ export function PostPageClient({ slug }: PostPageClientProps) {
 
             try {
                 const postData = await ServerApiClient.fetchPostBySlug(slug);
-
-                // Check if post is published
-                if (postData.status !== 'published') {
-                    console.log('Post not published, status:', postData.status);
-                    notFound();
-                }
-
                 setPost(postData);
             } catch (error) {
                 console.error('Error fetching post:', error);
@@ -86,9 +79,16 @@ export function PostPageClient({ slug }: PostPageClientProps) {
         <>
             {/* Article Header */}
             <header className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                    {post.title}
-                </h1>
+                <div className="flex items-center gap-3 mb-4">
+                    <h1 className="text-4xl font-bold text-gray-900">
+                        {post.title}
+                    </h1>
+                    {post.status === 'draft' && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Draft
+                        </span>
+                    )}
+                </div>
 
                 <div className="flex items-center justify-between flex-wrap gap-4 py-4 border-y border-gray-200">
                     <div className="flex items-center space-x-6">

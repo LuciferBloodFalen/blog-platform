@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { LikesService } from '@/services';
 
@@ -20,7 +20,29 @@ export function LikeButton({
     const [likesCount, setLikesCount] = useState(initialLikesCount);
     const [isLiked, setIsLiked] = useState(initialIsLiked);
     const [loading, setLoading] = useState(false);
+    const [statusLoaded, setStatusLoaded] = useState(false);
     const { isAuthenticated } = useAuth();
+
+    // Fetch current like status when component mounts (if authenticated)
+    useEffect(() => {
+        const fetchLikeStatus = async () => {
+            if (!statusLoaded && isAuthenticated) {
+                try {
+                    const status = await LikesService.getLikeStatus(postSlug);
+                    setLikesCount(status.likes_count);
+                    setIsLiked(status.liked);
+                } catch (error) {
+                    console.error('Error fetching like status:', error);
+                } finally {
+                    setStatusLoaded(true);
+                }
+            } else if (!isAuthenticated) {
+                setStatusLoaded(true);
+            }
+        };
+
+        fetchLikeStatus();
+    }, [postSlug, isAuthenticated, statusLoaded]);
 
     const handleLikeToggle = async () => {
         if (!isAuthenticated) {
@@ -30,19 +52,17 @@ export function LikeButton({
 
         setLoading(true);
         try {
+            let response;
             if (isLiked) {
-                await LikesService.unlikePost(postSlug);
-                const newCount = Math.max(0, likesCount - 1);
-                setLikesCount(newCount);
-                setIsLiked(false);
-                onLikeChange?.(newCount, false);
+                response = await LikesService.unlikePost(postSlug);
             } else {
-                await LikesService.likePost(postSlug);
-                const newCount = likesCount + 1;
-                setLikesCount(newCount);
-                setIsLiked(true);
-                onLikeChange?.(newCount, true);
+                response = await LikesService.likePost(postSlug);
             }
+
+            // Use server response to update UI
+            setLikesCount(response.likes_count);
+            setIsLiked(response.liked);
+            onLikeChange?.(response.likes_count, response.liked);
         } catch (error) {
             console.error('Error toggling like:', error);
             alert('Failed to update like. Please try again.');
@@ -56,8 +76,8 @@ export function LikeButton({
             onClick={handleLikeToggle}
             disabled={loading}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${isLiked
-                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 } ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
         >
             <svg

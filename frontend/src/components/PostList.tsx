@@ -54,19 +54,6 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
         }
     };
 
-    const handlePublishToggle = async (post: Post) => {
-        try {
-            if (post.status === 'published') {
-                await PostsService.unpublishPost(post.id);
-            } else {
-                await PostsService.publishPost(post.id);
-            }
-            loadPosts(); // Reload to get updated status
-        } catch (error) {
-            console.error('Failed to toggle publish status:', error);
-        }
-    };
-
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -193,20 +180,6 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </a>
-
-                                        {/* Toggle Publish */}
-                                        <button
-                                            onClick={() => handlePublishToggle(post)}
-                                            className={`p-2 transition-colors ${post.status === 'published'
-                                                ? 'text-green-600 hover:text-green-700'
-                                                : 'text-gray-400 hover:text-green-600'
-                                                }`}
-                                            title={post.status === 'published' ? 'Unpublish' : 'Publish'}
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-5 8V8m0 4v4m-7-4h14" />
-                                            </svg>
-                                        </button>
 
                                         {/* Edit Post */}
                                         <button
