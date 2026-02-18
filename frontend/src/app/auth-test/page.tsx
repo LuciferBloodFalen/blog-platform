@@ -35,7 +35,7 @@ export default function AuthTestPage() {
         try {
             addTestResult('🔄 Testing login...');
             await login({
-                username: testCredentials.username,
+                email: testCredentials.email,
                 password: testCredentials.password,
             });
             addTestResult('✅ Login successful');

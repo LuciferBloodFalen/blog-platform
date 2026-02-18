@@ -111,14 +111,14 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">
+            <div className="bg-white shadow-lg rounded-lg p-8 border-2 border-gray-100">
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-3xl font-bold text-black">
                         {isEditing ? 'Edit Post' : 'Create New Post'}
                     </h2>
                     <button
                         onClick={onCancel}
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-gray-600 hover:text-black transition-colors p-2"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -127,15 +127,20 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                 </div>
 
                 {errors.general && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
-                        {errors.general}
+                    <div className="mb-6 p-4 bg-black text-white rounded-lg border-l-4 border-red-500">
+                        <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.general}
+                        </div>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Title */}
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="title" className="block text-sm font-semibold text-black mb-2">
                             Title *
                         </label>
                         <input
@@ -143,16 +148,24 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                             id="title"
                             value={formData.title}
                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                            className={`mt-1 block w-full border rounded-md px-3 py-2 text-gray-900 bg-white ${errors.title ? 'border-red-300' : 'border-gray-300'
-                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                            className={`block w-full border-2 rounded-lg px-4 py-3 text-black bg-white transition-all duration-200 ${errors.title
+                                    ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                                    : 'border-gray-300 focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400'
+                                } focus:outline-none`}
+                            placeholder="Enter post title"
                             required
                         />
-                        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+                        {errors.title && <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.title}
+                        </p>}
                     </div>
 
                     {/* Content */}
                     <div>
-                        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="content" className="block text-sm font-semibold text-black mb-2">
                             Content *
                         </label>
                         <textarea
@@ -160,16 +173,24 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                             rows={15}
                             value={formData.content}
                             onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                            className={`mt-1 block w-full border rounded-md px-3 py-2 text-gray-900 bg-white resize-vertical ${errors.content ? 'border-red-300' : 'border-gray-300'
-                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                            className={`block w-full border-2 rounded-lg px-4 py-3 text-black bg-white resize-vertical transition-all duration-200 ${errors.content
+                                    ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                                    : 'border-gray-300 focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400'
+                                } focus:outline-none`}
+                            placeholder="Write your post content..."
                             required
                         />
-                        {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
+                        {errors.content && <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.content}
+                        </p>}
                     </div>
 
                     {/* Category */}
                     <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="category" className="block text-sm font-semibold text-black mb-2">
                             Category
                         </label>
                         <select
@@ -179,7 +200,7 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                                 ...prev,
                                 category: e.target.value ? parseInt(e.target.value) : undefined
                             }))}
-                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="block w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400 transition-all duration-200"
                         >
                             <option value="">Select a category</option>
                             {categories.map((category) => (
@@ -188,7 +209,12 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                                 </option>
                             ))}
                         </select>
-                        {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
+                        {errors.category && <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.category}
+                        </p>}
                     </div>
 
                     {/* Tags */}
@@ -215,36 +241,39 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                     </div>
 
                     {/* Publish Status */}
-                    <div className="flex items-center">
+                    <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border-2 border-gray-100">
                         <input
                             type="checkbox"
                             id="is_published"
                             checked={formData.is_published}
                             onChange={(e) => setFormData(prev => ({ ...prev, is_published: e.target.checked }))}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="h-5 w-5 text-black focus:ring-black border-2 border-gray-300 rounded transition-colors"
                         />
-                        <label htmlFor="is_published" className="ml-2 block text-sm text-gray-700">
+                        <label htmlFor="is_published" className="text-sm font-medium text-black">
                             Publish immediately
                         </label>
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <div className="flex items-center justify-end space-x-4 pt-8 border-t-2 border-gray-100">
                         <button
                             type="button"
                             onClick={onCancel}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                            className="px-6 py-3 text-sm font-semibold text-black bg-white border-2 border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 transition-all duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-3 text-sm font-semibold text-white bg-black border-2 border-black rounded-lg hover:bg-white hover:text-black focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 min-w-[140px]"
                         >
                             {loading ? (
-                                <div className="flex items-center space-x-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                <div className="flex items-center justify-center space-x-2">
+                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
                                     <span>{isEditing ? 'Updating...' : 'Creating...'}</span>
                                 </div>
                             ) : (

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Post } from '@/types/api';
 import { PostsService } from '@/services';
+import { LoadingList } from '@/components/Loading';
+import { APIError } from '@/components/APIError';
+import { NoPostsEmptyState } from '@/components/EmptyState';
 
 interface PostListProps {
     onEditPost: (post: Post) => void;
@@ -64,13 +67,27 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
 
     if (loading && posts.length === 0) {
         return (
-            <div className="bg-white shadow rounded-lg p-6">
+            <div className="bg-white shadow-lg rounded-xl border border-gray-100 p-8">
                 <div className="animate-pulse">
-                    <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
-                    {[...Array(5)].map((_, i) => (
-                        <div key={i} className="border-b border-gray-200 py-4">
-                            <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/3 mb-8"></div>
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="border-b border-gray-100 py-8 last:border-b-0">
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <div className="h-6 bg-gray-200 rounded w-2/3 mb-4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                                    <div className="flex space-x-2">
+                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-2">
+                                    <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                    <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                    <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -79,64 +96,88 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
     }
 
     return (
-        <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white shadow-lg rounded-xl border border-gray-100">
+            <div className="px-8 py-6 border-b border-gray-100">
+                <h3 className="text-2xl font-bold text-gray-900">
                     My Posts ({posts.length > 0 ? `${posts.length} of many` : '0'})
                 </h3>
             </div>
 
             {error && (
-                <div className="p-4 bg-red-50 border-l-4 border-red-400">
-                    <p className="text-red-700">{error}</p>
+                <div className="px-8 py-6">
+                    <APIError
+                        error={error}
+                        onRetry={() => {
+                            setError('');
+                            loadPosts();
+                        }}
+                        className="py-8"
+                    />
                 </div>
             )}
 
-            {posts.length === 0 && !loading ? (
-                <div className="text-center py-12">
-                    <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h4>
-                    <p className="text-gray-600 mb-4">
-                        You haven&apos;t created any posts yet. Start writing to share your thoughts with the world!
-                    </p>
-                </div>
-            ) : (
+            {posts.length === 0 && !loading && !error && (
+                <NoPostsEmptyState />
+            )}
+
+            {posts.length > 0 && !error && (
                 <>
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-100">
                         {posts.map((post) => (
-                            <div key={post.id} className="p-6 hover:bg-gray-50 transition-colors">
+                            <div key={post.id} className="p-8 hover:bg-gray-50 transition-all duration-300 hover:shadow-sm">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center space-x-3 mb-2">
-                                            <h4 className="text-lg font-medium text-gray-900 truncate">
+                                        <div className="flex items-center space-x-4 mb-4">
+                                            <h4 className="text-2xl font-bold text-gray-900 truncate group-hover:text-black transition-colors">
                                                 {post.title}
                                             </h4>
                                             <span
-                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${post.status === 'published'
-                                                    ? 'bg-green-100 text-green-800'
+                                                className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${post.status === 'published'
+                                                    ? 'bg-green-50 text-green-800 border border-green-200'
                                                     : post.status === 'draft'
-                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-gray-50 text-gray-800 border border-gray-300'
+                                                        : 'bg-gray-50 text-gray-800 border border-gray-300'
                                                     }`}
                                             >
+                                                {post.status === 'published' && (
+                                                    <svg className="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                )}
+                                                {post.status === 'draft' && (
+                                                    <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                                                    </svg>
+                                                )}
                                                 {post.status}
                                             </span>
                                         </div>
 
-                                        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                                            <span>Created: {formatDate(post.created_at)}</span>
-                                            <span>Updated: {formatDate(post.updated_at)}</span>
+                                        <div className="flex items-center space-x-6 text-sm text-gray-500 mb-6">
+                                            <span className="flex items-center space-x-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Created {formatDate(post.created_at)}
+                                            </span>
+                                            <span className="flex items-center space-x-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Updated {formatDate(post.updated_at)}
+                                            </span>
                                             {post.published_at && (
-                                                <span>Published: {formatDate(post.published_at)}</span>
+                                                <span className="flex items-center space-x-1">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                    Published {formatDate(post.published_at)}
+                                                </span>
                                             )}
                                         </div>
 
                                         {post.excerpt && (
-                                            <p className="text-gray-700 text-sm mb-3 line-clamp-2">
+                                            <p className="text-gray-700 text-base mb-6 line-clamp-2 leading-relaxed">
                                                 {post.excerpt}
                                             </p>
                                         )}
@@ -145,7 +186,7 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
                                             {post.categories.map((category) => (
                                                 <span
                                                     key={category.id}
-                                                    className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-800"
+                                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-black text-white"
                                                 >
                                                     {category.name}
                                                 </span>
@@ -153,26 +194,26 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
                                             {post.tags.slice(0, 3).map((tag) => (
                                                 <span
                                                     key={tag.id}
-                                                    className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-600"
+                                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200"
                                                 >
                                                     #{tag.name}
                                                 </span>
                                             ))}
                                             {post.tags.length > 3 && (
-                                                <span className="text-xs text-gray-500">
-                                                    +{post.tags.length - 3} more
+                                                <span className="text-sm text-gray-500 font-medium">
+                                                    +{post.tags.length - 3} more tags
                                                 </span>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center space-x-2 ml-4">
+                                    <div className="flex items-center space-x-3 ml-6">
                                         {/* View Post */}
                                         <a
                                             href={`/posts/${post.slug}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                                            className="inline-flex items-center p-3 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg transition-all duration-200"
                                             title="View post"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +225,7 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
                                         {/* Edit Post */}
                                         <button
                                             onClick={() => onEditPost(post)}
-                                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                                            className="inline-flex items-center p-3 text-gray-600 hover:text-white hover:bg-black rounded-lg transition-all duration-200"
                                             title="Edit post"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +236,7 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
                                         {/* Delete Post */}
                                         <button
                                             onClick={() => onDeletePost(post)}
-                                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                                            className="inline-flex items-center p-3 text-gray-600 hover:text-white hover:bg-red-600 rounded-lg transition-all duration-200"
                                             title="Delete post"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,25 +251,31 @@ export function PostList({ onEditPost, onDeletePost, refreshTrigger }: PostListP
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                            <div className="text-sm text-gray-700">
+                        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div className="text-sm text-gray-600 font-medium">
                                 Page {currentPage} of {totalPages}
                             </div>
 
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-3">
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                     disabled={!hasPrevious || loading}
-                                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300"
                                 >
+                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
                                     Previous
                                 </button>
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                     disabled={!hasNext || loading}
-                                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-black"
                                 >
                                     Next
+                                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
