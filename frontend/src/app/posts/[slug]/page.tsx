@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
         const post = await ServerApiClient.fetchPostBySlug(resolvedParams.slug);
 
         return {
-            title: `${post.title} | Blog Platform`,
+            title: post.title,
             description: post.excerpt || post.content.substring(0, 160),
             openGraph: {
                 title: post.title,
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
         console.error('Error fetching post for metadata:', error);
 
         return {
-            title: 'Post Not Found | Blog Platform',
+            title: 'Post Not Found',
             description: 'The requested post could not be found.',
         };
     }

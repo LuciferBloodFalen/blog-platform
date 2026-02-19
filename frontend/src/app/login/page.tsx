@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
+// Update page title
+if (typeof window !== 'undefined') {
+    document.title = 'Login - StackJournal';
+}
+
 export default function LoginPage() {
     const [formData, setFormData] = useState({
         email: '',
@@ -71,8 +76,8 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
-            <div className="max-w-md w-full space-y-8 p-8">
-                <div>
+            <div className="max-w-md w-full space-y-8 p-8 animate-fade-in">
+                <div className="animate-fade-in-up">
                     <h2 className="mt-6 text-center text-3xl font-bold text-black">
                         Sign in to your account
                     </h2>
@@ -80,18 +85,18 @@ export default function LoginPage() {
                         Or{' '}
                         <a
                             href="/register"
-                            className="font-medium text-black hover:text-gray-700 underline transition-colors"
+                            className="font-medium text-black hover:text-gray-700 underline transition-all duration-300 hover:tracking-wide"
                         >
                             create a new account
                         </a>
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                <form className="mt-8 space-y-6 animate-fade-in-up animation-delay-200" onSubmit={handleSubmit}>
                     {error && (
-                        <div className="bg-black text-white px-4 py-3 rounded-lg border-l-4 border-red-500">
+                        <div className="bg-black text-white px-4 py-3 rounded-lg border-l-4 border-red-500 animate-scale-in">
                             <div className="flex items-center">
-                                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="w-5 h-5 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
                                 {error}
@@ -100,8 +105,8 @@ export default function LoginPage() {
                     )}
 
                     <div className="space-y-5">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
+                        <div className="group">
+                            <label htmlFor="email" className="block text-sm font-medium text-black mb-2 transition-all duration-300 group-focus-within:text-gray-800 group-focus-within:font-semibold">
                                 Email Address
                             </label>
                             <input
@@ -111,13 +116,13 @@ export default function LoginPage() {
                                 required
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-200 hover:border-gray-400"
+                                className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-300 hover:border-gray-400 hover:shadow-md focus:scale-[1.02] transform-gpu"
                                 placeholder="Enter your email"
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
+                        <div className="group">
+                            <label htmlFor="password" className="block text-sm font-medium text-black mb-2 transition-all duration-300 group-focus-within:text-gray-800 group-focus-within:font-semibold">
                                 Password
                             </label>
                             <input
@@ -127,7 +132,7 @@ export default function LoginPage() {
                                 required
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-200 hover:border-gray-400"
+                                className="block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-300 hover:border-gray-400 hover:shadow-md focus:scale-[1.02] transform-gpu"
                                 placeholder="Enter your password"
                             />
                         </div>
@@ -137,7 +142,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full flex justify-center items-center py-3 px-4 border-2 border-black text-sm font-semibold rounded-lg text-white bg-black hover:bg-white hover:text-black focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                            className="group relative w-full flex justify-center items-center py-3 px-4 border-2 border-black text-sm font-semibold rounded-lg text-white bg-black hover:bg-white hover:text-black focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 transform-gpu"
                         >
                             {loading ? (
                                 <>
@@ -145,10 +150,10 @@ export default function LoginPage() {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Signing in...
+                                    <span className="transition-transform duration-300 group-hover:tracking-wide">Signing in...</span>
                                 </>
                             ) : (
-                                'Sign in'
+                                <span className="transition-transform duration-300 group-hover:tracking-wide">Sign in</span>
                             )}
                         </button>
                     </div>
@@ -156,7 +161,7 @@ export default function LoginPage() {
                     <div className="text-center">
                         <Link
                             href="/"
-                            className="font-medium text-black hover:text-gray-700 underline transition-colors"
+                            className="font-medium text-black hover:text-gray-700 underline transition-all duration-300 hover:tracking-wide hover:scale-105 inline-block"
                         >
                             ← Back to home
                         </Link>

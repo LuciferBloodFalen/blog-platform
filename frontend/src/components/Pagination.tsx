@@ -31,12 +31,12 @@ export function Pagination({
                 {hasPrevious ? (
                     <Link
                         href={generatePageUrl(currentPage - 1)}
-                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        className="relative inline-flex items-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-black transition-all duration-200"
                     >
                         Previous
                     </Link>
                 ) : (
-                    <span className="relative inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <span className="relative inline-flex items-center rounded-lg border-2 border-gray-300 bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-400 cursor-not-allowed">
                         Previous
                     </span>
                 )}
@@ -44,12 +44,12 @@ export function Pagination({
                 {hasNext ? (
                     <Link
                         href={generatePageUrl(currentPage + 1)}
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        className="relative ml-3 inline-flex items-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-black transition-all duration-200"
                     >
                         Next
                     </Link>
                 ) : (
-                    <span className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <span className="relative ml-3 inline-flex items-center rounded-lg border-2 border-gray-300 bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-400 cursor-not-allowed">
                         Next
                     </span>
                 )}
@@ -64,7 +64,7 @@ export function Pagination({
                 </div>
 
                 <div>
-                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <nav className="isolate inline-flex -space-x-px rounded-lg shadow-md" aria-label="Pagination">
                         {/* Previous button */}
                         {hasPrevious ? (
                             <Link
@@ -104,8 +104,8 @@ export function Pagination({
                                     key={pageNum}
                                     href={generatePageUrl(pageNum)}
                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${pageNum === currentPage
-                                            ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                                        ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                                        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                                         }`}
                                 >
                                     {pageNum}

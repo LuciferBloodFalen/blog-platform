@@ -10,6 +10,11 @@ import { useState, useEffect } from 'react';
 import { PostsService, CategoriesService, TagsService } from '@/services';
 import { Post, Category, Tag } from '@/types/api';
 
+// Update page title
+if (typeof window !== 'undefined') {
+  document.title = 'API Examples - StackJournal';
+}
+
 export default function ApiExamplePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);

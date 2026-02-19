@@ -45,7 +45,7 @@ export default function ProtectedRoute({
                         </p>
                         <button
                             onClick={() => router.push('/login')}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-all duration-200"
                         >
                             Go to Login
                         </button>

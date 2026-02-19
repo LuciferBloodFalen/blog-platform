@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
+// Update page title
+if (typeof window !== 'undefined') {
+    document.title = 'Create Account - StackJournal';
+}
+
 export default function RegisterPage() {
     const [formData, setFormData] = useState({
         username: '',
@@ -186,7 +191,7 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full flex justify-center items-center py-3 px-4 border-2 border-black text-sm font-semibold rounded-lg text-white bg-black hover:bg-white hover:text-black focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                            className="group relative w-full flex justify-center items-center py-3 px-6 border-2 border-black text-sm font-semibold rounded-lg text-white bg-black hover:bg-white hover:text-black focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 transform-gpu"
                         >
                             {loading ? (
                                 <>

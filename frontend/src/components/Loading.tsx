@@ -57,7 +57,7 @@ export function LoadingCard({ count = 1, className = '' }: LoadingCardProps) {
     return (
         <>
             {[...Array(count)].map((_, i) => (
-                <div key={i} className={`bg-white rounded-lg shadow-md animate-pulse ${className}`}>
+                <div key={i} className={`bg-white rounded-lg shadow-lg animate-pulse ${className}`}>
                     <div className="aspect-video bg-gray-300 rounded-t-lg"></div>
                     <div className="p-6 space-y-3">
                         <div className="h-6 bg-gray-300 rounded w-3/4"></div>
@@ -85,7 +85,7 @@ interface LoadingListProps {
 
 export function LoadingList({ count = 5, className = '' }: LoadingListProps) {
     return (
-        <div className={`bg-white shadow-lg rounded-xl border border-gray-100 ${className}`}>
+        <div className={`bg-white shadow-lg rounded-lg border-2 border-gray-100 ${className}`}>
             <div className="px-8 py-6 border-b border-gray-100">
                 <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
             </div>

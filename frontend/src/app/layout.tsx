@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'StackJournal',
+  title: {
+    template: '%s - StackJournal',
+    default: 'StackJournal'
+  },
   description: 'A modern platform for developers and tech enthusiasts to share knowledge and insights',
   openGraph: {
     title: 'StackJournal',

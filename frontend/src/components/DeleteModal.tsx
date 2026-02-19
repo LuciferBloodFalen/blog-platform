@@ -108,14 +108,14 @@ export function DeleteModal({ post, isOpen, onClose, onSuccess }: DeleteModalPro
                         <button
                             onClick={handleClose}
                             disabled={loading}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-3 text-sm font-semibold text-black bg-white border-2 border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-black focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleDelete}
                             disabled={loading}
-                            className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-3 text-sm font-semibold text-white bg-red-600 border-2 border-red-600 rounded-lg hover:bg-red-700 hover:border-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                         >
                             {loading ? (
                                 <div className="flex items-center space-x-2">

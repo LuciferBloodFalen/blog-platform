@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { PostsService } from '@/services';
 
+// Update page title
+if (typeof window !== 'undefined') {
+    document.title = 'Authentication Test - StackJournal';
+}
+
 export default function AuthTestPage() {
     const {
         user,
@@ -157,7 +162,7 @@ export default function AuthTestPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <button
                             onClick={testRegister}
-                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold transition-all duration-200"
                             disabled={loading}
                         >
                             Test Register
@@ -165,7 +170,7 @@ export default function AuthTestPage() {
 
                         <button
                             onClick={testLogin}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-all duration-200"
                             disabled={loading}
                         >
                             Test Login
@@ -173,7 +178,7 @@ export default function AuthTestPage() {
 
                         <button
                             onClick={testLogout}
-                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                            className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-semibold transition-all duration-200"
                             disabled={loading || !isAuthenticated}
                         >
                             Test Logout
@@ -181,7 +186,7 @@ export default function AuthTestPage() {
 
                         <button
                             onClick={testTokenRefresh}
-                            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-semibold transition-all duration-200"
                             disabled={loading || !isAuthenticated}
                         >
                             Test Refresh
@@ -189,7 +194,7 @@ export default function AuthTestPage() {
 
                         <button
                             onClick={testProtectedRoute}
-                            className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700"
+                            className="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 font-semibold transition-all duration-200"
                             disabled={loading}
                         >
                             Test Protected
@@ -197,7 +202,7 @@ export default function AuthTestPage() {
 
                         <button
                             onClick={showTokenInfo}
-                            className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 font-semibold transition-all duration-200"
                         >
                             Show Tokens
                         </button>

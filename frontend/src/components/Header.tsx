@@ -39,7 +39,7 @@ export function Header() {
                                 </Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold"
                                 >
                                     Logout
                                 </button>
@@ -54,7 +54,7 @@ export function Header() {
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                                 >
                                     Sign Up
                                 </Link>
