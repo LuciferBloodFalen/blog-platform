@@ -123,6 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -157,7 +158,29 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_ALL_ORIGINS = True  # remove this before production.
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Blog API",
-    "DESCRIPTION": "API documentation for the blog project",
+    "TITLE": "Blog Platform API",
+    "DESCRIPTION": "A comprehensive blog platform API with authentication, posts, comments, likes, and more",
     "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/",
+    "SCHEMA_PATH_PREFIX_TRIM": True,
+    "TAGS": [
+        {
+            "name": "Authentication",
+            "description": "User registration, login, logout operations",
+        },
+        {
+            "name": "Posts",
+            "description": "Blog post operations - create, read, update, delete",
+        },
+        {"name": "Comments", "description": "Post comment operations"},
+        {"name": "Likes", "description": "Like/unlike operations for posts"},
+        {"name": "Categories", "description": "Post category management"},
+        {"name": "Tags", "description": "Post tag management"},
+    ],
+    "CONTACT": {"name": "Blog Platform API", "email": "admin@blogplatform.example.com"},
+    "LICENSE": {
+        "name": "MIT License",
+    },
 }

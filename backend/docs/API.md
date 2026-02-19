@@ -2,11 +2,18 @@
 
 A RESTful API for a full-featured blogging platform with user authentication, posts, comments, likes, categories, and tags.
 
+## 🚀 Quick Links
+
+- **Interactive API Docs (Swagger UI):** [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- **OpenAPI Schema:** [http://localhost:8000/api/schema/](http://localhost:8000/api/schema/)
+- **API Root:** [http://localhost:8000/api/](http://localhost:8000/api/)
+
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Interactive Documentation](#interactive-documentation)
 - [Authentication](#authentication)
 - [Endpoints](#endpoints)
   - [Auth](#auth)
@@ -18,6 +25,8 @@ A RESTful API for a full-featured blogging platform with user authentication, po
 - [Query Parameters](#query-parameters)
 - [Pagination](#pagination)
 - [Error Handling](#error-handling)
+- [Rate Limiting](#rate-limiting)
+- [Changelog](#changelog)
 
 ---
 
@@ -28,6 +37,37 @@ A RESTful API for a full-featured blogging platform with user authentication, po
 | Base URL       | `http://localhost:8000/api`    |
 | Content-Type   | `application/json`             |
 | Authentication | JWT Bearer Token               |
+| API Version    | `1.0.0`                        |
+| OpenAPI Spec   | `3.0.2`                        |
+
+---
+
+## Interactive Documentation
+
+### Swagger UI (Recommended)
+
+For the best API exploration experience, use our **interactive Swagger UI**:
+
+```
+GET http://localhost:8000/api/docs/
+```
+
+**Features:**
+- 🔍 Explore all endpoints with real-time documentation
+- 🧪 Test API endpoints directly in your browser
+- 📝 View request/response schemas and examples
+- 🔐 Authenticate and test protected endpoints
+- 📚 Download OpenAPI specification
+
+### OpenAPI Schema
+
+Get the machine-readable API specification:
+
+```
+GET http://localhost:8000/api/schema/
+```
+
+**Formats:** JSON (default), YAML
 
 ---
 
@@ -800,10 +840,97 @@ The API uses standard HTTP status codes and returns errors in a consistent forma
 
 Currently, no rate limiting is implemented. Consider implementing rate limiting for production deployments.
 
+**Recommended Production Limits:**
+- Authentication endpoints: 5 requests/minute
+- Read operations: 100 requests/minute  
+- Write operations: 20 requests/minute
+
+---
+
+## Best Practices
+
+### Security
+- Always use HTTPS in production
+- Store JWT tokens securely (httpOnly cookies recommended)
+- Implement proper error handling to avoid information leakage
+- Validate and sanitize all input data
+
+### Performance
+- Use pagination for large datasets
+- Implement caching where appropriate
+- Use filter and search parameters efficiently
+- Consider implementing GraphQL for complex queries
+
+### API Usage
+- Include proper error handling in your client applications
+- Use appropriate HTTP methods (GET, POST, PUT, DELETE)
+- Follow RESTful conventions
+- Handle token expiration gracefully
+
+---
+
+## Testing the API
+
+### Using Swagger UI
+1. Navigate to [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+2. Click \"Authorize\" and enter your JWT token
+3. Explore and test endpoints interactively
+
+### Using curl
+
+**Register a new user:**
+```bash
+curl -X POST http://localhost:8000/api/auth/register/ \\
+  -H \"Content-Type: application/json\" \\
+  -d '{
+    \"username\": \"testuser\",
+    \"email\": \"test@example.com\",
+    \"password\": \"TestPass123!\"
+  }'
+```
+
+**Get posts with authentication:**
+```bash
+curl -X GET http://localhost:8000/api/posts/ \\
+  -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\"
+```
+
+### Postman Collection
+Import our Postman collection for easy testing:
+- Download OpenAPI spec: [http://localhost:8000/api/schema/](http://localhost:8000/api/schema/)
+- Import into Postman as OpenAPI 3.0 specification
+
+---
+
+## Additional Resources
+
+- **Django REST Framework:** [https://www.django-rest-framework.org/](https://www.django-rest-framework.org/)
+- **JWT Authentication:** [https://django-rest-framework-simplejwt.readthedocs.io/](https://django-rest-framework-simplejwt.readthedocs.io/)
+- **OpenAPI Specification:** [https://swagger.io/specification/](https://swagger.io/specification/)
+- **drf-spectacular:** [https://drf-spectacular.readthedocs.io/](https://drf-spectacular.readthedocs.io/)
+
+---
+
+## Support
+
+For issues and questions:
+- **GitHub Issues:** Create an issue in the project repository
+- **Documentation:** Check the `/docs` directory for detailed endpoint documentation
+- **Swagger UI:** Use interactive documentation for real-time testing
+
 ---
 
 ## Changelog
 
-| Version | Date       | Description        |
-|---------|------------|--------------------|
-| 1.0.0   | 2026-02-14 | Initial release    |
+| Version | Date       | Description                                    |
+|---------|------------|------------------------------------------------|
+| 1.0.0   | 2026-02-19 | Initial release with full API documentation   |
+|         |            | - Interactive Swagger UI documentation        |
+|         |            | - Complete authentication system              |
+|         |            | - Blog posts CRUD operations                  |
+|         |            | - Comments and likes functionality            |
+|         |            | - Categories and tags management              |
+
+---
+
+*This documentation is automatically generated and maintained. Last updated: February 19, 2026*

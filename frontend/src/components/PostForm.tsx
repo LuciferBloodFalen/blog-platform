@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Post, Category, Tag, CreatePostRequest, UpdatePostRequest } from '@/types/api';
+import {
+    Post,
+    Category,
+    Tag,
+    CreatePostRequest,
+    UpdatePostRequest,
+} from '@/types/api';
 import { PostsService, CategoriesService, TagsService } from '@/services';
 
 interface PostFormProps {
@@ -36,8 +42,9 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
             setFormData({
                 title: post.title,
                 content: post.content,
-                category: post.categories.length > 0 ? post.categories[0].id : undefined,
-                tags: post.tags.map(tag => tag.id),
+                category:
+                    post.categories.length > 0 ? post.categories[0].id : undefined,
+                tags: post.tags.map((tag) => tag.id),
                 is_published: post.status === 'published',
             });
         }
@@ -52,8 +59,8 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
             ]);
             setCategories(categoriesRes.results);
             setTags(tagsRes.results);
-        } catch (error) {
-            console.error('Failed to load form data:', error);
+        } catch {
+            setErrors({ general: 'Failed to load form data.' });
         } finally {
             setLoadingData(false);
         }
@@ -77,15 +84,21 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
             if (isEditing && post) {
                 savedPost = await PostsService.updatePost(post.slug, postData);
             } else {
-                savedPost = await PostsService.createPost(postData as CreatePostRequest);
+                savedPost = await PostsService.createPost(
+                    postData as CreatePostRequest
+                );
             }
 
             onSuccess(savedPost);
-        } catch (error: any) {
-            if (error?.errors) {
-                setErrors(error.errors);
+        } catch (error: unknown) {
+            const err = error as {
+                errors?: Record<string, string>;
+                message?: string;
+            };
+            if (err?.errors) {
+                setErrors(err.errors);
             } else {
-                setErrors({ general: error.message || 'Failed to save post' });
+                setErrors({ general: err.message || 'Failed to save post' });
             }
         } finally {
             setLoading(false);
@@ -93,11 +106,11 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
     };
 
     const handleTagToggle = (tagId: number) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             tags: prev.tags.includes(tagId)
-                ? prev.tags.filter(id => id !== tagId)
-                : [...prev.tags, tagId]
+                ? prev.tags.filter((id) => id !== tagId)
+                : [...prev.tags, tagId],
         }));
     };
 
@@ -120,8 +133,18 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                         onClick={onCancel}
                         className="text-gray-600 hover:text-black transition-colors p-2"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                            />
                         </svg>
                     </button>
                 </div>
@@ -129,8 +152,16 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                 {errors.general && (
                     <div className="mb-6 p-4 bg-black text-white rounded-lg border-l-4 border-red-500">
                         <div className="flex items-center">
-                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            <svg
+                                className="w-5 h-5 mr-2"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                    clipRule="evenodd"
+                                />
                             </svg>
                             {errors.general}
                         </div>
@@ -140,14 +171,19 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Title */}
                     <div>
-                        <label htmlFor="title" className="block text-sm font-semibold text-black mb-2">
+                        <label
+                            htmlFor="title"
+                            className="block text-sm font-semibold text-black mb-2"
+                        >
                             Title *
                         </label>
                         <input
                             type="text"
                             id="title"
                             value={formData.title}
-                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                            onChange={(e) =>
+                                setFormData((prev) => ({ ...prev, title: e.target.value }))
+                            }
                             className={`block w-full border-2 rounded-lg px-4 py-3 text-black bg-white transition-all duration-200 ${errors.title
                                     ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
                                     : 'border-gray-300 focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400'
@@ -155,24 +191,39 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                             placeholder="Enter post title"
                             required
                         />
-                        {errors.title && <p className="mt-2 text-sm text-red-600 flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            {errors.title}
-                        </p>}
+                        {errors.title && (
+                            <p className="mt-2 text-sm text-red-600 flex items-center">
+                                <svg
+                                    className="w-4 h-4 mr-1"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                                {errors.title}
+                            </p>
+                        )}
                     </div>
 
                     {/* Content */}
                     <div>
-                        <label htmlFor="content" className="block text-sm font-semibold text-black mb-2">
+                        <label
+                            htmlFor="content"
+                            className="block text-sm font-semibold text-black mb-2"
+                        >
                             Content *
                         </label>
                         <textarea
                             id="content"
                             rows={15}
                             value={formData.content}
-                            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                            onChange={(e) =>
+                                setFormData((prev) => ({ ...prev, content: e.target.value }))
+                            }
                             className={`block w-full border-2 rounded-lg px-4 py-3 text-black bg-white resize-vertical transition-all duration-200 ${errors.content
                                     ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200'
                                     : 'border-gray-300 focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400'
@@ -180,26 +231,43 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                             placeholder="Write your post content..."
                             required
                         />
-                        {errors.content && <p className="mt-2 text-sm text-red-600 flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            {errors.content}
-                        </p>}
+                        {errors.content && (
+                            <p className="mt-2 text-sm text-red-600 flex items-center">
+                                <svg
+                                    className="w-4 h-4 mr-1"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                                {errors.content}
+                            </p>
+                        )}
                     </div>
 
                     {/* Category */}
                     <div>
-                        <label htmlFor="category" className="block text-sm font-semibold text-black mb-2">
+                        <label
+                            htmlFor="category"
+                            className="block text-sm font-semibold text-black mb-2"
+                        >
                             Category
                         </label>
                         <select
                             id="category"
                             value={formData.category || ''}
-                            onChange={(e) => setFormData(prev => ({
-                                ...prev,
-                                category: e.target.value ? parseInt(e.target.value) : undefined
-                            }))}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    category: e.target.value
+                                        ? parseInt(e.target.value)
+                                        : undefined,
+                                }))
+                            }
                             className="block w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-black bg-white focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 hover:border-gray-400 transition-all duration-200"
                         >
                             <option value="">Select a category</option>
@@ -209,12 +277,22 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                                 </option>
                             ))}
                         </select>
-                        {errors.category && <p className="mt-2 text-sm text-red-600 flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            {errors.category}
-                        </p>}
+                        {errors.category && (
+                            <p className="mt-2 text-sm text-red-600 flex items-center">
+                                <svg
+                                    className="w-4 h-4 mr-1"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                                {errors.category}
+                            </p>
+                        )}
                     </div>
 
                     {/* Tags */}
@@ -229,15 +307,17 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                                     type="button"
                                     onClick={() => handleTagToggle(tag.id)}
                                     className={`px-3 py-1 rounded-full text-sm transition-colors ${formData.tags.includes(tag.id)
-                                        ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                                        : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                                            ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                            : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
                                         }`}
                                 >
                                     #{tag.name}
                                 </button>
                             ))}
                         </div>
-                        {errors.tags && <p className="mt-1 text-sm text-red-600">{errors.tags}</p>}
+                        {errors.tags && (
+                            <p className="mt-1 text-sm text-red-600">{errors.tags}</p>
+                        )}
                     </div>
 
                     {/* Publish Status */}
@@ -246,10 +326,18 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                             type="checkbox"
                             id="is_published"
                             checked={formData.is_published}
-                            onChange={(e) => setFormData(prev => ({ ...prev, is_published: e.target.checked }))}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    is_published: e.target.checked,
+                                }))
+                            }
                             className="h-5 w-5 text-black focus:ring-black border-2 border-gray-300 rounded transition-colors"
                         />
-                        <label htmlFor="is_published" className="text-sm font-medium text-black">
+                        <label
+                            htmlFor="is_published"
+                            className="text-sm font-medium text-black"
+                        >
                             Publish immediately
                         </label>
                     </div>
@@ -270,9 +358,25 @@ export function PostForm({ post, onSuccess, onCancel }: PostFormProps) {
                         >
                             {loading ? (
                                 <div className="flex items-center justify-center space-x-2">
-                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <svg
+                                        className="animate-spin h-4 w-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
                                     </svg>
                                     <span>{isEditing ? 'Updating...' : 'Creating...'}</span>
                                 </div>

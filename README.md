@@ -1,160 +1,116 @@
 # Blog Platform
 
-A modern full-stack blog platform built with **Next.js** (frontend) and **Django REST Framework** (backend).
+A full-stack blog platform with a Next.js frontend and a Django REST API backend.
 
-## Features
+## Stack
 
-- 🔐 **JWT Authentication** with automatic token refresh
-- ⚡ **Next.js 16** with TypeScript and App Router
-- 🎨 **Tailwind CSS** for modern UI styling
-- 🐍 **Django REST Framework** for robust backend API
-- 📱 **Responsive Design** for all screen sizes
-- 🔒 **Protected Routes** and role-based access
-- 🧪 **Built-in Testing Interface** for authentication flow
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS
+- **Backend:** Django 6, Django REST Framework, JWT
+- **Database:** PostgreSQL
+
+## Requirements
+
+- Node.js 18+
+- Python 3.8+
+- PostgreSQL 14+
 
 ## Quick Start
 
-### 1. Setup (First Time)
-```bash
-# Clone and setup the project
-./scripts/setup.sh
-```
-This will:
-- Install Python and Node.js dependencies
-- Create virtual environments
-- Set up environment files
-- Run initial database migrations
-
-### 2. Run the Project
-```bash
-# Start both frontend and backend servers
-./scripts/run-project.sh
-```
-
-Or run servers individually:
-```bash
-# Backend only (Django API server)
-./scripts/run-backend.sh
-
-# Frontend only (Next.js dev server)  
-./scripts/run-frontend.sh
-```
-
-### 3. Access the Application
-
-**Frontend (Next.js):**
-- Home: http://localhost:3000
-- Login: http://localhost:3000/login
-- Register: http://localhost:3000/register
-- Dashboard: http://localhost:3000/dashboard
-- Auth Test: http://localhost:3000/auth-test
-
-**Backend (Django API):**
-- API Root: http://localhost:8000/api/
-- Admin Panel: http://localhost:8000/admin/
-- API Documentation: http://localhost:8000/api/docs/
-
-## NPM Scripts
-
-You can also use npm scripts from the root directory:
-
-```bash
-npm run setup        # Run initial setup
-npm run dev          # Start both servers
-npm run dev:backend  # Start backend only
-npm run dev:frontend # Start frontend only
-npm run build        # Build frontend for production
-npm run lint         # Lint frontend code
-npm run format       # Format code with Prettier
-```
-
-## Project Structure
-
-```
-blog-platform/
-├── backend/          # Django REST API
-│   ├── apps/        # Django applications
-│   ├── config/      # Django settings
-│   ├── manage.py    # Django management
-│   └── requirements.txt
-├── frontend/         # Next.js application  
-│   ├── src/         # Source code
-│   ├── public/      # Static assets
-│   └── package.json
-├── setup.sh         # Initial setup script
-├── run-project.sh   # Run both servers
-├── run-backend.sh   # Run backend only
-├── run-frontend.sh  # Run frontend only
-└── package.json     # Root npm scripts
-```
-
-## Development
-
-### Prerequisites
-- **Node.js 18+**
-- **Python 3.8+**
-- **pip** (Python package manager)
-
-### Environment Configuration
+### 1. Configure environment
 
 **Backend** (`backend/.env`):
+
 ```env
 SECRET_KEY=your-secret-key
 DEBUG=True
-DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=localhost,127.0.0.1
+POSTGRES_DB=blog_db
+POSTGRES_USER=blog_user
+POSTGRES_PASSWORD=blog_password
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5432
 ```
 
 **Frontend** (`frontend/.env.local`):
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NODE_ENV=development
 ```
 
-### Testing Authentication
+### 2. Install dependencies
 
-Visit http://localhost:3000/auth-test for a comprehensive testing interface that lets you:
-- Test login/register functionality
-- Verify token refresh mechanism
-- Check protected route access
-- Monitor authentication state
+```bash
+# Backend
+cd backend
+python3 -m venv venv
+./venv/bin/pip install -r requirements.txt
 
-## Technology Stack
+# Frontend
+cd ../frontend
+npm install
+```
 
-### Frontend
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type safety and better DX
-- **Tailwind CSS** - Utility-first CSS framework
-- **Axios** - HTTP client with interceptors
+### 3. Run migrations
 
-### Backend  
-- **Django** - Python web framework
-- **Django REST Framework** - API functionality
-- **JWT Authentication** - Secure token-based auth
-- **PostgreSQL/SQLite** - Database support
+```bash
+cd ../backend
+./venv/bin/python manage.py migrate
+```
 
-## Scripts Overview
+### 4. Run the project
 
-| Script | Purpose |
-|--------|---------|
-| `./scripts/setup.sh` | Install dependencies and setup environment |
-| `./scripts/run-project.sh` | Start both frontend and backend concurrently |
-| `./scripts/run-backend.sh` | Start Django development server only |
-| `./scripts/run-frontend.sh` | Start Next.js development server only |
+```bash
+./run-project.sh
+```
 
-## Getting Help
+## Docker
 
-If you encounter issues:
+Build and run the full stack with Docker:
 
-1. **Check logs**: `tail -f backend.log frontend.log`
-2. **Verify setup**: Re-run `./scripts/setup.sh`
-3. **Check ports**: Ensure 3000 and 8000 are available
-4. **Environment**: Verify `.env` files exist and are configured
+```bash
+docker compose up --build
+```
 
-## Contributing
+### Docker environment
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with `npm run lint` and `npm run build`
-5. Submit a pull request
+Create `backend/.env` (or copy from `backend/.env.example`) and set these for Docker:
+
+```env
+SECRET_KEY=your-secret-key
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1
+POSTGRES_DB=blog_db
+POSTGRES_USER=blog_user
+POSTGRES_PASSWORD=blog_password
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+```
+
+### 5. Access the app
+
+- Frontend: http://localhost:3000
+- Backend API root: http://localhost:8000/
+- API docs: http://localhost:8000/api/docs/
+
+## Useful Commands
+
+```bash
+# Backend only
+cd backend
+./venv/bin/python manage.py runserver 0.0.0.0:8000
+
+# Frontend only
+cd frontend
+npm run dev
+```
+
+## Project Layout
+
+```
+blog-platform/
+├── backend/
+├── frontend/
+└── run-project.sh
+```

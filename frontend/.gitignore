@@ -31,11 +31,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (keep .env.example but ignore local/production env files)
+.env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env.*.local
+*.env
 
 # Allow .env.example to be committed
 !.env.example
@@ -46,3 +49,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Additional sensitive files
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.json
+config.json
+
+# Logs
+*.log
+logs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

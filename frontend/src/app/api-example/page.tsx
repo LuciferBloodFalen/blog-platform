@@ -43,7 +43,6 @@ export default function ApiExamplePage() {
       setTags(tagsResponse.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('API Error:', err);
     } finally {
       setLoading(false);
     }

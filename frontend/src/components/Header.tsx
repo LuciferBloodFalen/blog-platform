@@ -9,9 +9,7 @@ export function Header() {
     const handleLogout = async () => {
         try {
             await logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+        } catch { }
     };
 
     return (
@@ -28,9 +26,7 @@ export function Header() {
                     <nav className="flex space-x-4">
                         {isAuthenticated ? (
                             <>
-                                <span className="text-gray-600">
-                                    Welcome, {user?.username}
-                                </span>
+                                <span className="text-gray-600">Welcome, {user?.username}</span>
                                 <Link
                                     href="/dashboard"
                                     className="text-gray-600 hover:text-gray-900 transition-colors"

@@ -24,7 +24,7 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const [currentView, setCurrentView] = useState<DashboardView>('overview');
     const [editingPost, setEditingPost] = useState<Post | null>(null);
     const [deletingPost, setDeletingPost] = useState<Post | null>(null);
@@ -36,7 +36,7 @@ function DashboardContent() {
             overview: 'Dashboard - StackJournal',
             posts: 'My Posts - StackJournal',
             'create-post': 'Create Post - StackJournal',
-            'edit-post': 'Edit Post - StackJournal'
+            'edit-post': 'Edit Post - StackJournal',
         };
 
         if (typeof window !== 'undefined') {
@@ -44,13 +44,13 @@ function DashboardContent() {
         }
     }, [currentView]);
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    };
+    // Logout function (removed unused variable warning)
+    // const handleLogout = async () => {
+    //   try {
+    //     await logout();
+    //   } catch (error) {
+    //   }
+    // };
 
     const handleCreatePost = () => {
         setEditingPost(null);
@@ -66,15 +66,15 @@ function DashboardContent() {
         setDeletingPost(post);
     };
 
-    const handlePostSuccess = (post: Post) => {
+    const handlePostSuccess = () => {
         setCurrentView('posts');
         setEditingPost(null);
-        setRefreshTrigger(prev => prev + 1);
+        setRefreshTrigger((prev) => prev + 1);
     };
 
     const handleDeleteSuccess = () => {
         setDeletingPost(null);
-        setRefreshTrigger(prev => prev + 1);
+        setRefreshTrigger((prev) => prev + 1);
     };
 
     const handleCancelForm = () => {
@@ -110,7 +110,9 @@ function DashboardContent() {
                 );
             case 'overview':
             default:
-                return <DashboardOverview onCreatePost={handleCreatePost} user={user} />;
+                return (
+                    <DashboardOverview onCreatePost={handleCreatePost} user={user} />
+                );
         }
     };
 
@@ -132,8 +134,8 @@ function DashboardContent() {
                             <button
                                 onClick={() => setCurrentView('overview')}
                                 className={`py-4 px-1 border-b-2 font-semibold text-sm transition-all duration-200 ${currentView === 'overview'
-                                    ? 'border-black text-black'
-                                    : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
+                                        ? 'border-black text-black'
+                                        : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
                                     }`}
                             >
                                 Overview
@@ -141,8 +143,8 @@ function DashboardContent() {
                             <button
                                 onClick={() => setCurrentView('posts')}
                                 className={`py-4 px-1 border-b-2 font-semibold text-sm transition-all duration-200 ${currentView === 'posts'
-                                    ? 'border-black text-black'
-                                    : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
+                                        ? 'border-black text-black'
+                                        : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
                                     }`}
                             >
                                 My Posts
@@ -150,8 +152,8 @@ function DashboardContent() {
                             <button
                                 onClick={handleCreatePost}
                                 className={`py-4 px-1 border-b-2 font-semibold text-sm transition-all duration-200 ${currentView === 'create-post' || currentView === 'edit-post'
-                                    ? 'border-black text-black'
-                                    : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
+                                        ? 'border-black text-black'
+                                        : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
                                     }`}
                             >
                                 {currentView === 'edit-post' ? 'Edit Post' : 'Create Post'}
@@ -177,7 +179,19 @@ function DashboardContent() {
     );
 }
 
-function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; user: any }) {
+function DashboardOverview({
+    onCreatePost,
+    user,
+}: {
+    onCreatePost: () => void;
+    user: {
+        id: number;
+        username: string;
+        email: string;
+        is_author: boolean;
+        created_at: string;
+    } | null;
+}) {
     return (
         <div className="space-y-6 sm:space-y-8">
             {/* User Info Card */}
@@ -188,40 +202,40 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                     </h3>
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8">
                         <div>
-                            <dt className="text-sm font-semibold text-black">
-                                Username
-                            </dt>
+                            <dt className="text-sm font-semibold text-black">Username</dt>
                             <dd className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-700">
                                 {user?.username}
                             </dd>
                         </div>
                         <div>
                             <dt className="text-sm font-semibold text-black">Email</dt>
-                            <dd className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-700">{user?.email}</dd>
+                            <dd className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-700">
+                                {user?.email}
+                            </dd>
                         </div>
                         <div>
                             <dt className="text-sm font-semibold text-black">
                                 Author Status
                             </dt>
                             <dd className="mt-2">
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user?.is_author
-                                    ? 'bg-black text-white'
-                                    : 'bg-gray-100 text-black border border-gray-300'
-                                    }`}>
+                                <span
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user?.is_author
+                                            ? 'bg-black text-white'
+                                            : 'bg-gray-100 text-black border border-gray-300'
+                                        }`}
+                                >
                                     {user?.is_author ? 'Author' : 'Member'}
                                 </span>
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-sm font-semibold text-black">
-                                Member Since
-                            </dt>
+                            <dt className="text-sm font-semibold text-black">Member Since</dt>
                             <dd className="mt-2 text-base text-gray-700">
                                 {user?.created_at
                                     ? new Date(user.created_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
-                                        day: 'numeric'
+                                        day: 'numeric',
                                     })
                                     : 'N/A'}
                             </dd>
@@ -239,8 +253,18 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                     <div className="flex items-start space-x-3 sm:space-x-4">
                         <div className="flex-shrink-0">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-xl flex items-center justify-center group-hover:bg-white group-hover:border-2 group-hover:border-black transition-all duration-300 group-hover:rotate-12 group-hover:scale-110">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:text-black transition-all duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                <svg
+                                    className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:text-black transition-all duration-300 group-hover:rotate-90"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                    />
                                 </svg>
                             </div>
                         </div>
@@ -248,7 +272,9 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                             <h4 className="text-lg sm:text-xl font-bold text-black mb-1 sm:mb-2 transition-all duration-300 group-hover:text-gray-900 group-hover:tracking-wide">
                                 Create New Post
                             </h4>
-                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">Write and publish a new blog post to share your thoughts</p>
+                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">
+                                Write and publish a new blog post to share your thoughts
+                            </p>
                         </div>
                     </div>
                 </button>
@@ -257,8 +283,18 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                     <div className="flex items-start space-x-3 sm:space-x-4">
                         <div className="flex-shrink-0">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 border-2 border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-gray-50 group-hover:border-gray-400 group-hover:scale-110">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-black transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <svg
+                                    className="w-5 h-5 sm:w-6 sm:h-6 text-black transition-transform duration-300 group-hover:scale-110"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
                                 </svg>
                             </div>
                         </div>
@@ -266,7 +302,9 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                             <h4 className="text-lg sm:text-xl font-bold text-black mb-1 sm:mb-2 transition-colors duration-300 group-hover:text-gray-800">
                                 Manage Posts
                             </h4>
-                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">Edit, publish, or delete your existing posts</p>
+                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">
+                                Edit, publish, or delete your existing posts
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -275,8 +313,18 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                     <div className="flex items-start space-x-3 sm:space-x-4">
                         <div className="flex-shrink-0">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 border-2 border-gray-300 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-gray-50 group-hover:border-gray-400 group-hover:scale-110 group-hover:rotate-3">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-black transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                <svg
+                                    className="w-5 h-5 sm:w-6 sm:h-6 text-black transition-transform duration-300 group-hover:scale-110"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                    />
                                 </svg>
                             </div>
                         </div>
@@ -284,7 +332,9 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                             <h4 className="text-lg sm:text-xl font-bold text-black mb-1 sm:mb-2 transition-colors duration-300 group-hover:text-gray-800">
                                 Analytics
                             </h4>
-                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">View your post statistics and insights</p>
+                            <p className="text-sm sm:text-base text-gray-600 leading-relaxed transition-colors duration-300 group-hover:text-gray-700">
+                                View your post statistics and insights
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -295,8 +345,18 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                 <div className="flex items-start">
                     <div className="flex-shrink-0">
                         <div className="w-6 h-6 sm:w-8 sm:h-8 bg-black rounded-full flex items-center justify-center">
-                            <svg className="h-3 w-3 sm:h-5 sm:w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg
+                                className="h-3 w-3 sm:h-5 sm:w-5 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                             </svg>
                         </div>
                     </div>
@@ -305,8 +365,9 @@ function DashboardOverview({ onCreatePost, user }: { onCreatePost: () => void; u
                             Welcome to your dashboard!
                         </h3>
                         <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            From here you can create new blog posts, manage your existing content, and track your writing progress.
-                            Click "Create New Post" to get started with your first article.
+                            From here you can create new blog posts, manage your existing
+                            content, and track your writing progress. Click &quot;Create New
+                            Post&quot; to get started with your first article.
                         </p>
                     </div>
                 </div>

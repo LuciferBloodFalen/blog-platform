@@ -11,9 +11,7 @@ export function Navbar() {
     const handleLogout = async () => {
         try {
             await logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+        } catch { }
     };
 
     const toggleMenu = () => {
@@ -36,10 +34,16 @@ export function Navbar() {
                             onClick={closeMenu}
                         >
                             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-black rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-lg">
-                                <span className="text-white font-bold text-sm sm:text-lg transition-transform duration-300 group-hover:scale-110">S</span>
+                                <span className="text-white font-bold text-sm sm:text-lg transition-transform duration-300 group-hover:scale-110">
+                                    S
+                                </span>
                             </div>
-                            <span className="text-lg sm:text-xl font-bold hidden xs:block transition-all duration-300 group-hover:tracking-wide">StackJournal</span>
-                            <span className="text-lg sm:text-xl font-bold block xs:hidden transition-all duration-300 group-hover:tracking-wide">SJ</span>
+                            <span className="text-lg sm:text-xl font-bold hidden xs:block transition-all duration-300 group-hover:tracking-wide">
+                                StackJournal
+                            </span>
+                            <span className="text-lg sm:text-xl font-bold block xs:hidden transition-all duration-300 group-hover:tracking-wide">
+                                SJ
+                            </span>
                         </Link>
                     </div>
 
@@ -75,7 +79,9 @@ export function Navbar() {
                                     <div className="flex items-center space-x-2">
                                         <div className="w-7 h-7 bg-black rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg">
                                             <span className="text-white text-xs font-medium">
-                                                {user?.username?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || '?'}
+                                                {user?.username?.charAt(0)?.toUpperCase() ||
+                                                    user?.email?.charAt(0)?.toUpperCase() ||
+                                                    '?'}
                                             </span>
                                         </div>
                                         <button
@@ -113,15 +119,37 @@ export function Navbar() {
                             aria-expanded={isMenuOpen}
                             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                         >
-                            <span className="sr-only">{isMenuOpen ? 'Close' : 'Open'} main menu</span>
+                            <span className="sr-only">
+                                {isMenuOpen ? 'Close' : 'Open'} main menu
+                            </span>
                             <div className="block h-5 w-5 sm:h-6 sm:w-6">
                                 {!isMenuOpen ? (
-                                    <svg className="h-full w-full" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    <svg
+                                        className="h-full w-full"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M4 6h16M4 12h16M4 18h16"
+                                        />
                                     </svg>
                                 ) : (
-                                    <svg className="h-full w-full" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    <svg
+                                        className="h-full w-full"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
                                     </svg>
                                 )}
                             </div>
@@ -131,8 +159,12 @@ export function Navbar() {
             </div>
 
             {/* Mobile menu */}
-            <div className={`lg:hidden border-t-2 border-gray-100 transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-                }`}>
+            <div
+                className={`lg:hidden border-t-2 border-gray-100 transition-all duration-300 ease-in-out ${isMenuOpen
+                        ? 'max-h-96 opacity-100'
+                        : 'max-h-0 opacity-0 overflow-hidden'
+                    }`}
+            >
                 <div className="px-3 pt-3 pb-4 space-y-1 bg-white shadow-xl">
                     <Link
                         href="/"
@@ -162,7 +194,9 @@ export function Navbar() {
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
                                         <span className="text-white text-sm font-medium">
-                                            {user?.username?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || '?'}
+                                            {user?.username?.charAt(0)?.toUpperCase() ||
+                                                user?.email?.charAt(0)?.toUpperCase() ||
+                                                '?'}
                                         </span>
                                     </div>
                                     <span className="text-sm font-medium text-gray-700">

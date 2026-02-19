@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -13,15 +14,54 @@ from .serializers import (
 
 
 class RegisterView(APIView):
-    """API view for user registration.
+    """
+    User Registration
 
-    POST: Creates a new user account with username, email, and password.
-          Returns JWT tokens and user data on success.
-          No authentication required.
+    Create a new user account with username, email, and password.
+    Returns JWT tokens and user data on successful registration.
     """
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        operation_id="auth_register",
+        tags=["Authentication"],
+        summary="Register new user",
+        description="Create a new user account and receive authentication tokens",
+        request=RegisterSerializer,
+        responses={
+            201: OpenApiResponse(
+                description="User created successfully",
+                examples=[
+                    OpenApiExample(
+                        "Registration Success",
+                        value={
+                            "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                            "user": {
+                                "id": 1,
+                                "username": "johndoe",
+                                "email": "john@example.com",
+                                "is_author": False,
+                                "created_at": "2026-02-19T10:00:00Z",
+                            },
+                        },
+                    )
+                ],
+            ),
+            400: OpenApiResponse(description="Invalid data provided"),
+        },
+        examples=[
+            OpenApiExample(
+                "Registration Request",
+                value={
+                    "username": "johndoe",
+                    "email": "john@example.com",
+                    "password": "SecurePassword123!",
+                },
+            )
+        ],
+    )
     def post(self, request):
         """Register a new user and return JWT tokens.
 
@@ -51,12 +91,52 @@ class RegisterView(APIView):
 
 
 class LoginAPIView(APIView):
-    """API view for user authentication.
+    """
+    User Authentication
 
-    POST: Authenticates user credentials and returns JWT tokens.
-          No authentication required.
+    Authenticate user credentials and return JWT tokens for API access.
     """
 
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        operation_id="auth_login",
+        tags=["Authentication"],
+        summary="User login",
+        description="Authenticate with username/email and password to receive JWT tokens",
+        request=LoginSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Login successful",
+                examples=[
+                    OpenApiExample(
+                        "Login Success",
+                        value={
+                            "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                            "user": {
+                                "id": 1,
+                                "username": "johndoe",
+                                "email": "john@example.com",
+                                "is_author": False,
+                            },
+                        },
+                    )
+                ],
+            ),
+            400: OpenApiResponse(description="Invalid credentials"),
+        },
+        examples=[
+            OpenApiExample(
+                "Login Request",
+                value={"username": "johndoe", "password": "SecurePassword123!"},
+            ),
+            OpenApiExample(
+                "Login with Email",
+                value={"email": "john@example.com", "password": "SecurePassword123!"},
+            ),
+        ],
+    )
     def post(self, request):
         """Authenticate user and return JWT tokens.
 
@@ -69,14 +149,38 @@ class LoginAPIView(APIView):
 
 
 class LogoutAPIView(APIView):
-    """API view for user logout.
+    """
+    User Logout
 
-    POST: Blacklists the refresh token to invalidate the session.
-          Requires authentication.
+    Invalidate the current session by blacklisting the refresh token.
     """
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        operation_id="auth_logout",
+        tags=["Authentication"],
+        summary="User logout",
+        description="Blacklist the refresh token to invalidate the session",
+        request=LogoutSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Logout successful",
+                examples=[
+                    OpenApiExample(
+                        "Logout Success", value={"message": "Successfully logged out"}
+                    )
+                ],
+            ),
+            400: OpenApiResponse(description="Invalid refresh token"),
+        },
+        examples=[
+            OpenApiExample(
+                "Logout Request",
+                value={"refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
+            )
+        ],
+    )
     def post(self, request):
         """Logout user by blacklisting their refresh token.
 

@@ -15,7 +15,7 @@ export function LikeButton({
     postSlug,
     initialLikesCount = 0,
     initialIsLiked = false,
-    onLikeChange
+    onLikeChange,
 }: LikeButtonProps) {
     const [likesCount, setLikesCount] = useState(initialLikesCount);
     const [isLiked, setIsLiked] = useState(initialIsLiked);
@@ -31,8 +31,7 @@ export function LikeButton({
                     const status = await LikesService.getLikeStatus(postSlug);
                     setLikesCount(status.likes_count);
                     setIsLiked(status.liked);
-                } catch (error) {
-                    console.error('Error fetching like status:', error);
+                } catch {
                 } finally {
                     setStatusLoaded(true);
                 }
@@ -63,8 +62,7 @@ export function LikeButton({
             setLikesCount(response.likes_count);
             setIsLiked(response.liked);
             onLikeChange?.(response.likes_count, response.liked);
-        } catch (error) {
-            console.error('Error toggling like:', error);
+        } catch {
             alert('Failed to update like. Please try again.');
         } finally {
             setLoading(false);
@@ -76,8 +74,8 @@ export function LikeButton({
             onClick={handleLikeToggle}
             disabled={loading}
             className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${isLiked
-                ? 'bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-200 hover:border-red-300'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300'
+                    ? 'bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-200 hover:border-red-300'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300'
                 } ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
         >
             <svg

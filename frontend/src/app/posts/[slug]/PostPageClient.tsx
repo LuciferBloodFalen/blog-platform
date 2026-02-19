@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { ServerApiClient } from '@/lib/server-api-client';
 import { CommentSection } from '@/components/CommentSection';
 import { LikeButton } from '@/components/LikeButton';
@@ -53,8 +53,7 @@ export function PostPageClient({ slug }: PostPageClientProps) {
             try {
                 const postData = await ServerApiClient.fetchPostBySlug(slug);
                 setPost(postData);
-            } catch (error) {
-                console.error('Error fetching post:', error);
+            } catch {
                 notFound();
             } finally {
                 setLoading(false);
@@ -90,8 +89,18 @@ export function PostPageClient({ slug }: PostPageClientProps) {
                         onClick={() => router.back()}
                         className="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-white border-2 border-gray-200 rounded-lg hover:bg-black hover:text-white transition-all duration-200"
                     >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 19l-7-7 7-7"
+                            />
                         </svg>
                         Back
                     </button>
@@ -137,10 +146,22 @@ export function PostPageClient({ slug }: PostPageClientProps) {
                             />
 
                             <div className="flex items-center space-x-2">
-                                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                <svg
+                                    className="w-5 h-5 text-gray-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                    />
                                 </svg>
-                                <span className="text-gray-600 font-medium">{post.comments_count || 0}</span>
+                                <span className="text-gray-600 font-medium">
+                                    {post.comments_count || 0}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -149,9 +170,12 @@ export function PostPageClient({ slug }: PostPageClientProps) {
                 {/* Featured Image */}
                 {post.featured_image && (
                     <div className="mb-12">
-                        <img
+                        <Image
                             src={post.featured_image}
                             alt={post.title}
+                            width={1200}
+                            height={675}
+                            sizes="(max-width: 1024px) 100vw, 1200px"
                             className="w-full h-auto rounded-lg border border-gray-200"
                         />
                     </div>
@@ -170,41 +194,46 @@ export function PostPageClient({ slug }: PostPageClientProps) {
                 </article>
 
                 {/* Categories and Tags */}
-                {((post.categories && post.categories.length > 0) || (post.tags && post.tags.length > 0)) && (
-                    <div className="mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                        {post.categories && post.categories.length > 0 && (
-                            <div className="mb-4">
-                                <h4 className="text-base font-semibold text-black mb-3">Categories</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {post.categories.map((category) => (
-                                        <span
-                                            key={category.id}
-                                            className="px-3 py-1 bg-black text-white text-sm font-medium rounded-full"
-                                        >
-                                            {category.name}
-                                        </span>
-                                    ))}
+                {((post.categories && post.categories.length > 0) ||
+                    (post.tags && post.tags.length > 0)) && (
+                        <div className="mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                            {post.categories && post.categories.length > 0 && (
+                                <div className="mb-4">
+                                    <h4 className="text-base font-semibold text-black mb-3">
+                                        Categories
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {post.categories.map((category) => (
+                                            <span
+                                                key={category.id}
+                                                className="px-3 py-1 bg-black text-white text-sm font-medium rounded-full"
+                                            >
+                                                {category.name}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {post.tags && post.tags.length > 0 && (
-                            <div>
-                                <h4 className="text-base font-semibold text-black mb-3">Tags</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {post.tags.map((tag) => (
-                                        <span
-                                            key={tag.id}
-                                            className="px-3 py-1 bg-white text-black text-sm font-medium rounded-full border border-gray-300"
-                                        >
-                                            #{tag.name}
-                                        </span>
-                                    ))}
+                            {post.tags && post.tags.length > 0 && (
+                                <div>
+                                    <h4 className="text-base font-semibold text-black mb-3">
+                                        Tags
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {post.tags.map((tag) => (
+                                            <span
+                                                key={tag.id}
+                                                className="px-3 py-1 bg-white text-black text-sm font-medium rounded-full border border-gray-300"
+                                            >
+                                                #{tag.name}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    )}
 
                 {/* Comments Section */}
                 <section className="pt-8">

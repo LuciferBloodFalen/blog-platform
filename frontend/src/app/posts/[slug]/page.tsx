@@ -9,7 +9,9 @@ interface PostPageProps {
 }
 
 // Metadata for SEO
-export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+export async function generateMetadata({
+    params,
+}: PostPageProps): Promise<Metadata> {
     const resolvedParams = await params;
 
     try {
@@ -33,9 +35,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
                 images: post.featured_image ? [post.featured_image] : [],
             },
         };
-    } catch (error) {
-        console.error('Error fetching post for metadata:', error);
-
+    } catch {
         return {
             title: 'Post Not Found',
             description: 'The requested post could not be found.',

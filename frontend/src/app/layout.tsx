@@ -20,18 +20,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     template: '%s - StackJournal',
-    default: 'StackJournal'
+    default: 'StackJournal',
   },
-  description: 'A modern platform for developers and tech enthusiasts to share knowledge and insights',
+  description:
+    'A modern platform for developers and tech enthusiasts to share knowledge and insights',
   openGraph: {
     title: 'StackJournal',
-    description: 'A modern platform for developers and tech enthusiasts to share knowledge and insights',
+    description:
+      'A modern platform for developers and tech enthusiasts to share knowledge and insights',
     siteName: 'StackJournal',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'StackJournal',
-    description: 'A modern platform for developers and tech enthusiasts to share knowledge and insights',
+    description:
+      'A modern platform for developers and tech enthusiasts to share knowledge and insights',
   },
 };
 
@@ -49,9 +52,7 @@ export default function RootLayout({
           <AuthInitializer>
             <ErrorBoundary>
               <Navbar />
-              <main className="flex-grow">
-                {children}
-              </main>
+              <main className="flex-grow">{children}</main>
               <Footer />
             </ErrorBoundary>
           </AuthInitializer>

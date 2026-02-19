@@ -35,10 +35,11 @@ export class AuthService {
   static async logout(refreshToken?: string | null): Promise<void> {
     if (refreshToken) {
       try {
-        await apiClient.post(`${this.BASE_PATH}/logout/`, { refresh: refreshToken });
-      } catch (error) {
+        await apiClient.post(`${this.BASE_PATH}/logout/`, {
+          refresh: refreshToken,
+        });
+      } catch {
         // Even if logout fails, continue with cleanup
-        console.warn('Server logout failed:', error);
       }
     }
 
