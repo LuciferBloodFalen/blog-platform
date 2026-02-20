@@ -57,7 +57,7 @@ export function Navbar() {
                                 Home
                             </Link>
                             <Link
-                                href="/posts"
+                                href="/#posts"
                                 className="text-black hover:text-gray-700 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:bg-gray-50 hover:scale-105 active:scale-95"
                             >
                                 Posts
@@ -161,8 +161,8 @@ export function Navbar() {
             {/* Mobile menu */}
             <div
                 className={`lg:hidden border-t-2 border-gray-100 transition-all duration-300 ease-in-out ${isMenuOpen
-                        ? 'max-h-96 opacity-100'
-                        : 'max-h-0 opacity-0 overflow-hidden'
+                    ? 'max-h-96 opacity-100'
+                    : 'max-h-0 opacity-0 overflow-hidden'
                     }`}
             >
                 <div className="px-3 pt-3 pb-4 space-y-1 bg-white shadow-xl">
@@ -174,7 +174,7 @@ export function Navbar() {
                         Home
                     </Link>
                     <Link
-                        href="/posts"
+                        href="/#posts"
                         className="text-black hover:text-gray-700 hover:bg-gray-50 block px-4 py-3 rounded-lg text-base font-semibold transition-all duration-200"
                         onClick={closeMenu}
                     >

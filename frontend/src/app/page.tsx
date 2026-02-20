@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 };
 
 interface HomePageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
     category?: string;
     tag?: string;
-  };
+  }>;
 }
 
 function PostsLoading() {
@@ -35,7 +35,8 @@ async function PostsList({
 }: {
   searchParams: HomePageProps['searchParams'];
 }) {
-  const currentPage = parseInt(searchParams.page || '1', 10);
+  const resolvedSearchParams = await searchParams;
+  const currentPage = parseInt(resolvedSearchParams.page || '1', 10);
   const pageSize = 12;
 
   let postsData;
@@ -43,9 +44,9 @@ async function PostsList({
     postsData = await ServerApiClient.fetchPublishedPosts({
       page: currentPage,
       page_size: pageSize,
-      search: searchParams.search,
-      category: searchParams.category,
-      tag: searchParams.tag,
+      search: resolvedSearchParams.search,
+      category: resolvedSearchParams.category,
+      tag: resolvedSearchParams.tag,
     });
   } catch {
     return (
@@ -63,7 +64,7 @@ async function PostsList({
     return (
       <SearchEmptyState
         searchTerm={
-          searchParams.search || searchParams.category || searchParams.tag
+          resolvedSearchParams.search || resolvedSearchParams.category || resolvedSearchParams.tag
         }
       />
     );
@@ -91,7 +92,7 @@ async function PostsList({
   );
 }
 
-export default function Home({ searchParams }: HomePageProps) {
+export default async function Home({ searchParams }: HomePageProps) {
   return (
     <HomePageClient>
       {/* Hero Section */}
@@ -117,7 +118,7 @@ export default function Home({ searchParams }: HomePageProps) {
               </span>
             </Link>
             <Link
-              href="#posts"
+              href="/#posts"
               className="border-2 border-white text-white px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl hover:shadow-white/25 active:scale-95 group"
             >
               <span className="transition-transform duration-300 group-hover:tracking-wide">

@@ -104,7 +104,7 @@ export function CommentSection({
                                 onChange={(e) => setNewComment(e.target.value)}
                                 placeholder="Share your thoughts..."
                                 rows={4}
-                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-200 hover:border-gray-400 resize-vertical"
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-2 focus:ring-black focus:ring-opacity-20 transition-all duration-200 hover:border-gray-400 resize-vertical text-black"
                             />
                         </div>
                         <button

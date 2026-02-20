@@ -39,9 +39,11 @@ export function Footer() {
                   </svg>
                 </a>
                 <a
-                  href="#"
+                  href="https://github.com/LuciferBloodFalen"
                   className="text-gray-400 hover:text-white transition-colors"
                   aria-label="GitHub"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <svg
                     className="w-5 h-5"
@@ -88,7 +90,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/posts"
+                    href="/#posts"
                     className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
                     All Posts
